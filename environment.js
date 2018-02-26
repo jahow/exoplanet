@@ -35,6 +35,19 @@ class Environment {
       temperature: 0
     }
   }
+
+  getGridChunks (minX, maxX, minY, maxY, encoded) {
+    const coords = []
+    const baseX = Math.floor(minX / CHUNK_SIZE) * CHUNK_SIZE
+    const baseY = Math.floor(minY / CHUNK_SIZE) * CHUNK_SIZE
+    let i, j
+    for (i = baseX; i <= maxX; i += CHUNK_SIZE) {
+      for (j = baseY; j <= maxY; j += CHUNK_SIZE) {
+        coords.push([i, j])
+      }
+    }
+    return this.grid.getChunks(coords, encoded)
+  }
 }
 
 export default Environment

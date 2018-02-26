@@ -1,4 +1,4 @@
-import { startSimulation, handleMessage } from './simulation'
+import { startSimulation, registerViewer, handleMessage } from './simulation'
 
 // SETUP
 const express = require('express')
@@ -31,9 +31,19 @@ io.on('connection', function (socket) {
     console.log('user ' + socket.id + ' disconnected')
   })
 
+  // register this viewer in the sim
+  registerViewer(socket.id)
+
   // all messages are handled by the sim
-  socket.on('message', msg => {
-    handleMessage(msg)
+  // expected message structure is:
+  // {
+  //   name: string,
+  //   args: { object }
+  // }
+  // send the result if a confirmation callback was given
+  socket.on('message', (msg, callback) => {
+    const res = handleMessage(socket.id, msg.name, msg.args)
+    callback && callback(res)
   })
 })
 

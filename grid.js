@@ -1,3 +1,5 @@
+import { encodeMaterialInfo } from './materials'
+
 // the grid handles materials arranged in squares, subdivided in chunks
 // a chunk has a spatial, square boundary
 export const CHUNK_SIZE = 32
@@ -20,9 +22,17 @@ class Grid {
     let x, y
     for (let i = 0; i < chunk.length; i++) {
       x = i % CHUNK_SIZE + chunkX * CHUNK_SIZE
-      y = Math.floor(i / CHUNK_SIZE) + chunkY * CH
+      y = Math.floor(i / CHUNK_SIZE) + chunkY * CHUNK_SIZE
       chunk[i] = this.cellCallback(x, y)
     }
+  }
+
+  getChunks (coords, encoded) {
+    return coords.reduce((prev, coord) => {
+      prev[`${coord[0]} ${coord[1]}`] = encoded
+        ? encodeMaterialInfo(this.getChunk(coord[0], coord[1]))
+        : this.getChunk(coord[0], coord[1])
+    }, {})
   }
 }
 
