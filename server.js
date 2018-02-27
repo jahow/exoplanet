@@ -15,7 +15,8 @@ app.use(bodyParser.urlencoded({ extended: true })) // support encoded bodies
 
 // ROUTES
 // try static files in the public folder when accessing the root URL
-app.use(express.static(path.join(__dirname, '/public')))
+app.use(express.static(path.join(__dirname, 'client', 'dist')))
+app.use(express.static(path.join(__dirname, 'public')))
 
 // if no static file found, send 404
 app.use(function (req, res, next) {
