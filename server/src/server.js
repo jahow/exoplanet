@@ -1,11 +1,12 @@
 import { startSimulation, registerViewer, handleMessage } from './simulation'
+import socketio from 'socket.io'
 
 // SETUP
 const express = require('express')
 const app = express()
 
 const http = require('http').Server(app)
-const io = require('socket.io')(http)
+const io = socketio(http)
 const path = require('path')
 const argv = require('minimist')(process.argv)
 
