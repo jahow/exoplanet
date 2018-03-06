@@ -22,7 +22,7 @@ class Environment {
   constructor (environmentType) {
     this.entities = []
     this.type = environmentType
-    this.grid = new Grid(this.cellGenerationCallback)
+    this.grid = new Grid(this.cellGenerationCallback.bind(this))
   }
 
   cellGenerationCallback (x, y) {

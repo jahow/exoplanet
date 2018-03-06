@@ -14,6 +14,7 @@ fs.readdirSync('node_modules')
 
 module.exports = [{
   mode: 'development',
+  devtool: 'source-map',
   entry: './client/src/index.js',
   module: {
     rules: [
@@ -39,6 +40,7 @@ module.exports = [{
 }, {
   mode: 'development',
   target: 'node',
+  devtool: 'source-map',
   entry: './server/src/server.js',
   module: {
     rules: [

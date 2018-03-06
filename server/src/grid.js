@@ -25,13 +25,15 @@ class Grid {
       y = Math.floor(i / CHUNK_SIZE) + chunkY * CHUNK_SIZE
       chunk[i] = this.cellCallback(x, y)
     }
+    return chunk
   }
 
   getChunks (coords, encoded) {
     return coords.reduce((prev, coord) => {
+      const chunk = this.getChunk(coord[0], coord[1])
       prev[`${coord[0]} ${coord[1]}`] = encoded
-        ? encodeMaterialInfo(this.getChunk(coord[0], coord[1]))
-        : this.getChunk(coord[0], coord[1])
+        ? chunk.map(encodeMaterialInfo) : chunk
+      return prev
     }, {})
   }
 }

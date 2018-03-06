@@ -58,7 +58,7 @@ class Simulation {
   setViewExtent (viewerId, extent) {
     const v = this.getViewer(viewerId)
     v.viewExtent = capExtent(extent, MAX_EXTENT_SIZE)
-    return v
+    return v.viewExtent
   }
 }
 
@@ -66,6 +66,7 @@ class Simulation {
 const sim = new Simulation()
 
 export function startSimulation () {
+  console.log('Simulation started')
   sim.start()
 }
 
@@ -80,6 +81,7 @@ export function handleMessage (senderId, message, args) {
   switch (message) {
     case 'moveView':
       const extent = sim.setViewExtent(senderId, args)
+      // console.log(extent)
       return sim.getEnvironment().getGridChunks(
         extent.minX, extent.maxX, extent.minY, extent.maxY,
         true)
