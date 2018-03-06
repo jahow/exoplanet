@@ -1,11 +1,45 @@
 const path = require('path')
+const fs = require('fs')
 
-module.exports = {
+// set node modules as commonjs externals
+// see: https://jlongster.com/Backend-Apps-with-Webpack--Part-I
+var nodeModules = {}
+fs.readdirSync('node_modules')
+  .filter(function (x) {
+    return ['.bin'].indexOf(x) === -1
+  })
+  .forEach(function (mod) {
+    nodeModules[mod] = 'commonjs ' + mod
+  })
+
+module.exports = [{
   mode: 'development',
-  entry: {
-    client: './client/src/index.js',
-    server: './server/src/server.js'
+  entry: './client/src/index.js',
+  module: {
+    rules: [
+      {
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        },
+        include: path.resolve(__dirname, 'client', 'src'),
+        test: /\.js?$/
+      }
+    ]
   },
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'client', 'dist')
+  },
+  devServer: {
+    contentBase: './client/dist'
+  }
+}, {
+  mode: 'development',
+  target: 'node',
+  entry: './server/src/server.js',
   module: {
     rules: [
       {
@@ -24,10 +58,11 @@ module.exports = {
     ]
   },
   output: {
-    filename: '[name]/dist/bundle.js',
-    path: path.resolve(__dirname)
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'server', 'dist')
   },
-  devServer: {
-    contentBase: './client/dist'
+  externals: nodeModules,
+  node: {
+    __dirname: false
   }
-}
+}]
