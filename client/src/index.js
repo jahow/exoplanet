@@ -1,4 +1,5 @@
 import io from 'socket.io-client'
+import init from './scene'
 
 const socket = io()
 
@@ -17,3 +18,9 @@ socket.on('connect', () => {
     console.log(data)
   })
 })
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (BABYLON.Engine.isSupported()) {
+    init()
+  }
+}, false)

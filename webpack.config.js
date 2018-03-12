@@ -14,7 +14,7 @@ fs.readdirSync('node_modules')
 
 module.exports = [{
   mode: 'development',
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
   entry: './client/src/index.js',
   module: {
     rules: [
@@ -26,16 +26,27 @@ module.exports = [{
           }
         },
         include: path.resolve(__dirname, 'client', 'src'),
-        test: /\.js?$/
+        test: /\.jsx?$/
+      }, {
+        test: /\.tsx?$/,
+        include: path.resolve(__dirname, 'client', 'src'),
+        use: 'ts-loader',
+        exclude: /node_modules/
       }
     ]
   },
+  resolve: {
+    extensions: ['.ts', '.js']
+  },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'client', 'dist')
+    path: path.resolve(__dirname, 'client', 'dist'),
+    publicPath: '/'
   },
   devServer: {
-    contentBase: './client/dist'
+    contentBase: [
+      path.resolve(__dirname, 'public')
+    ]
   }
 }, {
   mode: 'development',
