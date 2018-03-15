@@ -1,5 +1,5 @@
 import io from 'socket.io-client'
-import init from './scene'
+import init from './main'
 
 const socket = io()
 
