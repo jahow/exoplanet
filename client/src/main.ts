@@ -13,9 +13,10 @@ export default function init () {
   // Create the camera
   const camera = new BABYLON.ArcRotateCamera('main',
     -Math.PI / 2, Math.PI / 2, 100,
-    new BABYLON.Vector3(0, 0, 0), scene)
+    new BABYLON.Vector3(16, 16, 0), scene)
   camera.attachControl(canvas)
 
+  // scene.debugLayer.show()
 
   BABYLON.Mesh.CreateSphere("sphere", 10, 1, scene)
   let s1 = BABYLON.Mesh.CreateSphere("sphere", 10, 1, scene)
