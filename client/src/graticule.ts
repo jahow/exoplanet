@@ -1,4 +1,4 @@
-import {pushQuad} from './utils.geom'
+import {pushColoredQuad} from './utils.geom'
 import {getGenericMaterial} from './materials'
 
 // todo: get this from common code
@@ -20,6 +20,11 @@ export default class Graticule {
 
     this.mesh = new BABYLON.Mesh('graticule', scene)
     this.mesh.material = getGenericMaterial(scene)
+    this.mesh.visibility = 0.9999  // triggers alpha blending
+
+    // temp: generate one mesh per digit
+    // TODO: find a better way to handle text (glyph atlas / SDF)
+
   }
 
   update () {
@@ -57,10 +62,10 @@ export default class Graticule {
 
     for (let x = this.minX; x <= this.maxX; x += CHUNK_SIZE) {
       for (let y = this.minY; y <= this.maxY; y += CHUNK_SIZE) {
-        pushQuad(this.positions, this.colors, this.indices,
+        pushColoredQuad(this.positions, this.colors, this.indices,
           x - 1, x, y - 4.5, y + 3.5,
           BABYLON.Color4.FromInts(255, 255, 255, 100))
-        pushQuad(this.positions, this.colors, this.indices,
+        pushColoredQuad(this.positions, this.colors, this.indices,
           x - 4.5, x + 3.5, y - 1, y,
           BABYLON.Color4.FromInts(255, 255, 255, 100))
       } 

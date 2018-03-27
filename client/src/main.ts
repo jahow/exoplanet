@@ -1,4 +1,6 @@
 import Graticule from './graticule'
+import {getTextMaterial} from './materials'
+import {pushTexturedQuad} from './utils.geom'
 
 export default function init () {
   // Get canvas
@@ -18,13 +20,24 @@ export default function init () {
 
   // scene.debugLayer.show()
 
-  BABYLON.Mesh.CreateSphere("sphere", 10, 1, scene)
-  let s1 = BABYLON.Mesh.CreateSphere("sphere", 10, 1, scene)
-  s1.position.set(32, 0, 0)
-  let s2 = BABYLON.Mesh.CreateSphere("sphere", 10, 1, scene)
-  s2.position.set(0, 32, 0)
-
   const graticule = new Graticule(scene, camera)
+
+  const mesh = new BABYLON.Mesh('aaa', scene)
+  mesh.material = getTextMaterial(scene, 'arial', 'normal')
+  mesh.visibility = 0.9999
+  const positions: number[] = []
+  const colors: number[] = []
+  const uvs: number[] = []
+  const indices: number[] = []
+  pushTexturedQuad(positions, colors, uvs, indices,
+    0, 20, 0, 20,
+    BABYLON.Color4.FromInts(255, 150, 120, 255),
+    0, 1, 0, 1)
+
+  mesh.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions, true);
+  mesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors, true);
+  mesh.setVerticesData(BABYLON.VertexBuffer.UVKind, uvs, true);
+  mesh.setIndices(indices, positions.length / 3, true)
 
   engine.runRenderLoop(function () {
     graticule.update()
