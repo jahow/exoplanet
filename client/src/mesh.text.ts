@@ -86,7 +86,7 @@ function generateFontBundle (scene: BABYLON.Scene,
 
   textMaterial.setTexture('glyphAtlas', texture)
   textMaterial.setFloat('buffer', 0.75)
-  textMaterial.setFloat('gamma', 0.03)
+  textMaterial.setFloat('gamma', 0.1)
 
   return {
     material: textMaterial,

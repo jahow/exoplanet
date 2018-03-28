@@ -1,10 +1,12 @@
 import {pushColoredQuad} from './utils.geom'
 import {getGenericMaterial} from './materials'
+import {generateTextMesh, TEXT_ANCHOR} from './mesh.text'
 
 // todo: get this from common code
 const CHUNK_SIZE = 32
 
 export default class Graticule {
+  scene: BABYLON.Scene
   positions: number[]
   colors: number[]
   indices: number[]
@@ -14,17 +16,16 @@ export default class Graticule {
   maxY: number
   camera: BABYLON.ArcRotateCamera
   mesh: BABYLON.Mesh
+  textMeshes: BABYLON.Mesh[]
 
   constructor (scene: BABYLON.Scene, camera: BABYLON.ArcRotateCamera) {
+    this.scene = scene
     this.camera = camera
 
     this.mesh = new BABYLON.Mesh('graticule', scene)
     this.mesh.material = getGenericMaterial(scene)
     this.mesh.visibility = 0.9999  // triggers alpha blending
-
-    // temp: generate one mesh per digit
-    // TODO: find a better way to handle text (glyph atlas / SDF)
-
+    this.textMeshes = []
   }
 
   update () {
@@ -56,6 +57,11 @@ export default class Graticule {
   }
 
   rebuildMesh () {
+    // clear existing text meshes
+    this.textMeshes.forEach(m => m.dispose(false, false))
+    this.textMeshes.length = 0
+
+    // generate cross
     this.positions = []
     this.colors = []
     this.indices = []
@@ -68,6 +74,13 @@ export default class Graticule {
         pushColoredQuad(this.positions, this.colors, this.indices,
           x - 4.5, x + 3.5, y - 1, y,
           BABYLON.Color4.FromInts(255, 255, 255, 100))
+
+        // text mesh
+        this.textMeshes.push(
+          generateTextMesh(this.scene, 'monospace', 'normal', `${x},${y}`,
+            4, new BABYLON.Vector2(x + 2, y + 2), TEXT_ANCHOR.BOTTOMLEFT,
+            BABYLON.Color4.FromInts(255, 255, 255, 100))
+        )
       } 
     }
 
