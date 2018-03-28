@@ -21,10 +21,8 @@ export default function init () {
 
   const graticule = new Graticule(scene, camera)
 
-  generateTextMesh(scene, 'serif', 'normal', 'This is a test. &é"&é\'#~[{|{#}}]',
-      10, new BABYLON.Vector2(5, 5), TEXT_ANCHOR.TOPLEFT)
-  generateTextMesh(scene, 'serif', 'normal', '0,0',
-      10, new BABYLON.Vector2(0, 0), TEXT_ANCHOR.CENTER)
+  generateTextMesh(scene, 'monospace', 'normal', '0,0',
+      6, new BABYLON.Vector2(2, 2), TEXT_ANCHOR.BOTTOMLEFT, BABYLON.Color4.FromInts(255, 255, 255, 100))
 
   engine.runRenderLoop(function () {
     graticule.update()

@@ -90,22 +90,22 @@ function generateFontBundle (scene: BABYLON.Scene,
 
   return {
     material: textMaterial,
-    bufferRatio: buffer / fontSize * 0.75,
+    bufferRatio: buffer / fontSize,
     glyphs,
     defaultGlyph: glyphs[chars[chars.length - 1]]  // last glyph is the default one
   }
 }
 
 export const TEXT_ANCHOR: {[key: string]: [number, number]} = {
-  TOPLEFT: [0, 0],
-  TOPRIGHT: [1, 0],
-  BOTTOMLEFT: [0, 1],
-  BOTTOMRIGHT: [1, 1],
+  TOPLEFT: [0, 1],
+  TOPRIGHT: [1, 1],
+  BOTTOMLEFT: [0, 0],
+  BOTTOMRIGHT: [1, 0],
   CENTER: [0.5, 0.5],
   MIDDLELEFT: [0, 0.5],
   MIDDLERIGHT: [1, 0.5],
-  TOPMIDDLE: [0.5, 0],
-  BOTTOMMIDDLE: [0.5, 1]
+  TOPMIDDLE: [0.5, 1],
+  BOTTOMMIDDLE: [0.5, 0]
 }
 
 /**
@@ -134,12 +134,12 @@ export function generateTextMesh (scene: BABYLON.Scene,
 
   // compute global width & height and start position
   const chars = text.split('')
-  const buffer = bundle.bufferRatio * 2 * charHeight
+  const buffer = bundle.bufferRatio * charHeight
   const totalWidth = chars.reduce((prev, char) => {
     let glyph = bundle.glyphs[char] || bundle.defaultGlyph
-    return prev + glyph.widthRatio * charHeight - buffer * 2
+    return prev + glyph.widthRatio * charHeight
   }, 0)
-  const totalHeight = charHeight - buffer * 2
+  const totalHeight = charHeight
   let x = position.x - anchor[0] * totalWidth
   let y = position.y - anchor[1] * totalHeight
 
