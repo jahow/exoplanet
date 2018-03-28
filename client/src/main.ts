@@ -1,6 +1,5 @@
-import Graticule from './graticule'
-import {getTextMaterial} from './materials'
-import {pushTexturedQuad} from './utils.geom'
+import Graticule from './mesh.graticule'
+import {generateTextMesh, TEXT_ANCHOR} from './mesh.text'
 
 export default function init () {
   // Get canvas
@@ -22,22 +21,10 @@ export default function init () {
 
   const graticule = new Graticule(scene, camera)
 
-  const mesh = new BABYLON.Mesh('aaa', scene)
-  mesh.material = getTextMaterial(scene, 'arial', 'normal')
-  mesh.visibility = 0.9999
-  const positions: number[] = []
-  const colors: number[] = []
-  const uvs: number[] = []
-  const indices: number[] = []
-  pushTexturedQuad(positions, colors, uvs, indices,
-    0, 20, 0, 20,
-    BABYLON.Color4.FromInts(255, 150, 120, 255),
-    0, 1, 0, 1)
-
-  mesh.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions, true);
-  mesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors, true);
-  mesh.setVerticesData(BABYLON.VertexBuffer.UVKind, uvs, true);
-  mesh.setIndices(indices, positions.length / 3, true)
+  generateTextMesh(scene, 'serif', 'normal', 'This is a test. &é"&é\'#~[{|{#}}]',
+      10, new BABYLON.Vector2(5, 5), TEXT_ANCHOR.TOPLEFT)
+  generateTextMesh(scene, 'serif', 'normal', '0,0',
+      10, new BABYLON.Vector2(0, 0), TEXT_ANCHOR.CENTER)
 
   engine.runRenderLoop(function () {
     graticule.update()
