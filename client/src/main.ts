@@ -1,31 +1,25 @@
 import Graticule from './mesh.graticule'
 import {generateTextMesh, TEXT_ANCHOR} from './mesh.text'
+import {initGlobals, getEngine, getScene, getCanvas} from './globals'
 
 export default function init () {
-  // Get canvas
-  const canvas = document.getElementById("render-target") as HTMLCanvasElement
-
-  // Create babylon engine
-  const engine = new BABYLON.Engine(canvas, true)
-
-  // Create scene
-  const scene = new BABYLON.Scene(engine)
+  initGlobals()
 
   // Create the camera
   const camera = new BABYLON.ArcRotateCamera('main',
     -Math.PI / 2, Math.PI / 2, 100,
-    new BABYLON.Vector3(16, 16, 0), scene)
-  camera.attachControl(canvas)
+    new BABYLON.Vector3(16, 16, 0), getScene())
+  camera.attachControl(getCanvas())
 
   // scene.debugLayer.show()
 
-  const graticule = new Graticule(scene, camera)
+  const graticule = new Graticule(camera)
 
-  generateTextMesh(scene, 'monospace', 'normal', 'origin',
+  generateTextMesh('monospace', 'normal', 'origin',
       6, new BABYLON.Vector2(16, 16), TEXT_ANCHOR.CENTER)
 
-  engine.runRenderLoop(function () {
+  getEngine().runRenderLoop(function () {
     graticule.update()
-    scene.render()
+    getScene().render()
   })
 }

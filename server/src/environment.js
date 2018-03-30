@@ -1,5 +1,5 @@
 import Grid, { CHUNK_SIZE } from './grid'
-import * as Materials from './materials'
+import * as Materials from '../../shared/src/materials'
 
 // a grid cell is the unit of measure ie 1 meter
 // as a planet is made of chunks, its perimeter must be a multiple of a chunk

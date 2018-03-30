@@ -1,4 +1,4 @@
-import * as Materials from './materials'
+import * as Materials from '../../shared/src/materials'
 
 export function createCell () {
   return {

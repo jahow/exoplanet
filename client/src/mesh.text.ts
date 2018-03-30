@@ -1,6 +1,7 @@
 import * as TinySDF from 'tiny-sdf'
 import {arrayFromRange} from './utils.misc'
 import {pushTexturedQuad} from './utils.geom'
+import {getScene} from './globals'
 
 interface GlyphInfo {
   widthRatio: number,  // width / height
@@ -22,9 +23,9 @@ const bundles: {[key: string]: FontBundle} = {}
 /**
  * Will return a FontBundle with a material and info on contained glyphs
  */
-function generateFontBundle (scene: BABYLON.Scene,
+function generateFontBundle (
     fontFamily: string, fontWeight: 'normal' | 'bold'): FontBundle {
-  const textMaterial = new BABYLON.ShaderMaterial('text', scene, './text-shader',
+  const textMaterial = new BABYLON.ShaderMaterial('text', getScene(), './text-shader',
     {
         attributes: ['position', 'color', 'uv'],
         uniforms: ['worldViewProjection', 'gamma', 'buffer'],
@@ -45,7 +46,7 @@ function generateFontBundle (scene: BABYLON.Scene,
   const texture = new BABYLON.DynamicTexture('glyphs', {
       width: textureSize,
       height: textureSize
-    }, scene, true)
+    }, getScene(), true)
   const ctx = texture.getContext()
   ctx.font = fontWeight + ' ' + fontSize + 'px ' + fontFamily
   ctx.textBaseline = 'middle'
@@ -112,16 +113,16 @@ export const TEXT_ANCHOR: {[key: string]: [number, number]} = {
  * Generates a mesh for text rendering
  * Optional: give an existing mesh as argument to reuse it
  */
-export function generateTextMesh (scene: BABYLON.Scene,
+export function generateTextMesh (
     fontFamily: string, fontWeight: 'normal' | 'bold',
     text: string, charHeight: number, position: BABYLON.Vector2, anchor: [number, number],
     color?: BABYLON.Color4, existingMesh?: BABYLON.Mesh): BABYLON.Mesh {
-  const mesh = existingMesh || new BABYLON.Mesh('text', scene)
+  const mesh = existingMesh || new BABYLON.Mesh('text', getScene())
   let color_ = color || BABYLON.Color4.FromInts(255, 255, 255, 255)
 
   // font bundle (reuse if available)
   const key = fontFamily + '#' + fontWeight
-  const bundle = bundles[key] || generateFontBundle(scene, fontFamily, fontWeight)
+  const bundle = bundles[key] || generateFontBundle(fontFamily, fontWeight)
   bundles[key] = bundle
 
   // generate mesh vertices

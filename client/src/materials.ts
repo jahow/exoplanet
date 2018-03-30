@@ -1,12 +1,14 @@
+import {getScene} from './globals'
+
 let genericMaterial: BABYLON.Material
 
 /**
  * Will return a material using the generic shaders
  * No texture, only position & color
  */
-export function getGenericMaterial (scene: BABYLON.Scene): BABYLON.Material {
+export function getGenericMaterial (): BABYLON.Material {
   if (!genericMaterial) {
-    genericMaterial = new BABYLON.ShaderMaterial('generic', scene, './generic-shader',
+    genericMaterial = new BABYLON.ShaderMaterial('generic', getScene(), './generic-shader',
       {
           attributes: ['position', 'color'],
           uniforms: ['worldViewProjection']

@@ -1,12 +1,10 @@
 import {pushColoredQuad} from './utils.geom'
 import {getGenericMaterial} from './materials'
 import {generateTextMesh, TEXT_ANCHOR} from './mesh.text'
-
-// todo: get this from common code
-const CHUNK_SIZE = 32
+import {getScene} from './globals'
+import {CHUNK_SIZE} from '../../shared/src/globals'
 
 export default class Graticule {
-  scene: BABYLON.Scene
   positions: number[]
   colors: number[]
   indices: number[]
@@ -18,12 +16,11 @@ export default class Graticule {
   mesh: BABYLON.Mesh
   textMeshes: BABYLON.Mesh[]
 
-  constructor (scene: BABYLON.Scene, camera: BABYLON.ArcRotateCamera) {
-    this.scene = scene
+  constructor (camera: BABYLON.ArcRotateCamera) {
     this.camera = camera
 
-    this.mesh = new BABYLON.Mesh('graticule', scene)
-    this.mesh.material = getGenericMaterial(scene)
+    this.mesh = new BABYLON.Mesh('graticule', getScene())
+    this.mesh.material = getGenericMaterial()
     this.mesh.visibility = 0.9999  // triggers alpha blending
     this.textMeshes = []
   }
@@ -77,7 +74,7 @@ export default class Graticule {
 
         // text mesh
         this.textMeshes.push(
-          generateTextMesh(this.scene, 'monospace', 'normal', `${x},${y}`,
+          generateTextMesh('monospace', 'normal', `${x},${y}`,
             4, new BABYLON.Vector2(x + 2, y + 2), TEXT_ANCHOR.BOTTOMLEFT,
             BABYLON.Color4.FromInts(255, 255, 255, 100))
         )

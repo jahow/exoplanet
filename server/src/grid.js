@@ -1,8 +1,5 @@
-import { encodeMaterialInfo } from './materials'
-
-// the grid handles materials arranged in squares, subdivided in chunks
-// a chunk has a spatial, square boundary
-export const CHUNK_SIZE = 32
+import { encodeMaterialInfo } from '../../shared/src/materials'
+import {CHUNK_SIZE} from '../../shared/src/globals'
 
 class Grid {
   constructor (generateCellCallback) {
