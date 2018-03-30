@@ -82,9 +82,11 @@ export function handleMessage (senderId, message, args) {
     case 'moveView':
       const extent = sim.setViewExtent(senderId, args)
       // console.log(extent)
-      return sim.getEnvironment().getGridChunks(
-        extent.minX, extent.maxX, extent.minY, extent.maxY,
-        true)
+      return {
+        chunks: sim.getEnvironment().getGridChunks(
+          extent.minX, extent.maxX, extent.minY, extent.maxY,
+          true)
+      }
     case 'alterGridCell':
       // return
   }

@@ -36,9 +36,9 @@ function clamp (v) {
  * @param {CellInfo} cellInfo
  */
 export function encodeMaterialInfo (cellInfo) {
-  return clamp(cellInfo.class) << 32 +
-    clamp(cellInfo.amount) << 24 +
-    clamp(cellInfo.pressure) << 16 +
+  return (clamp(cellInfo.class) << 24) +
+    (clamp(cellInfo.amount) << 16) +
+    (clamp(cellInfo.pressure) << 8) +
     clamp(cellInfo.temperature)
 }
 
@@ -48,9 +48,9 @@ export function encodeMaterialInfo (cellInfo) {
  */
 export function decodeMaterialInfo (value) {
   return {
-    class: (value >> 32) & 0xFF,
-    amount: (value >> 24) & 0xFF,
-    pressure: (value >> 16) & 0xFF,
+    class: (value >> 24) & 0xFF,
+    amount: (value >> 16) & 0xFF,
+    pressure: (value >> 8) & 0xFF,
     temperature: value & 0xFF
   }
 }

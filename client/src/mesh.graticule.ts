@@ -22,6 +22,7 @@ export default class Graticule {
     this.mesh = new BABYLON.Mesh('graticule', getScene())
     this.mesh.material = getGenericMaterial()
     this.mesh.visibility = 0.9999  // triggers alpha blending
+    this.mesh.position.z = -0.01
     this.textMeshes = []
   }
 
@@ -73,11 +74,11 @@ export default class Graticule {
           BABYLON.Color4.FromInts(255, 255, 255, 100))
 
         // text mesh
-        this.textMeshes.push(
-          generateTextMesh('monospace', 'normal', `${x},${y}`,
+        const m = generateTextMesh('monospace', 'normal', `${x},${y}`,
             4, new BABYLON.Vector2(x + 2, y + 2), TEXT_ANCHOR.BOTTOMLEFT,
             BABYLON.Color4.FromInts(255, 255, 255, 100))
-        )
+        m.position.z = -0.01
+        this.textMeshes.push(m)
       } 
     }
 

@@ -1,34 +1,32 @@
-import {pushColoredQuad} from './utils.geom'
-import {getScene} from './globals'
-
-class GridChunk {
-	baseX: number
-	baseY: number
-	mesh: BABYLON.Mesh
-
-	constructor(baseX: number, baseY: number) {
-		this.baseX = baseX
-		this.baseY = baseY
-		this.mesh = new BABYLON.Mesh(`chunk ${baseX} ${baseY}`, getScene())
-
-		this.generateMesh()
-	}
-
-	generateMesh() {
-
-	}
-}
+import {ChunkCollection} from './interfaces'
+import {GridChunk} from './mesh.gridchunk'
 
 export default class Grid {
-	chunks: GridChunk[]
+  chunks: {
+    [key: string]: GridChunk    // key is "<x> <y>"
+  }
 
-	constructor() {
-		// temp: generate 
-		this.chunks = [
-			new GridChunk(0, 0),
-			new GridChunk(-32, 0),
-			new GridChunk(-32, -32),
-			new GridChunk(0, -32)
-		]
-	}
+  constructor() {
+    this.chunks = {}
+  }
+
+  /**
+   * Copy the encoded chunks in the collection into the grid
+   */
+  updateChunks(encodedChunks: ChunkCollection) {
+    Object.keys(encodedChunks).forEach(key => {
+      this.getChunkByKey(key).updateChunk(encodedChunks[key])
+    })
+  }
+
+  /**
+   * Return a grid chunk, create it if absent from a coord key (<x> <y>)
+   */
+  getChunkByKey(key: string): GridChunk {
+    if (!this.chunks[key]) {
+      const coords = key.split(' ').map(c => parseInt(c))
+      this.chunks[key] = new GridChunk(coords[0], coords[1])
+    }
+    return this.chunks[key]
+  }
 }
