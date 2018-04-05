@@ -13,13 +13,10 @@ export default class Graticule {
   maxX: number
   minY: number
   maxY: number
-  camera: BABYLON.ArcRotateCamera
   mesh: BABYLON.Mesh
   textMeshes: BABYLON.Mesh[]
 
-  constructor (camera: BABYLON.ArcRotateCamera) {
-    this.camera = camera
-
+  constructor () {
     this.mesh = new BABYLON.Mesh('graticule', getScene())
     this.mesh.material = getGenericMaterial()
     this.mesh.visibility = 0.9999  // triggers alpha blending
@@ -29,7 +26,7 @@ export default class Graticule {
 
   update () {
     // compute view extent
-    const extent = getViewExtent(this.camera)
+    const extent = getViewExtent()
 
     if (extent.minX !== this.minX || this.minY !== extent.minY ||
         extent.maxX !== this.maxX || this.maxY !== extent.maxY) {

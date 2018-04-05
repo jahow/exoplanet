@@ -14,19 +14,16 @@ socket.on('connect', () => {
 
 // UPSTREAM EVENTS
 
-export function handleViewMove (view: BABYLON.Camera) {
-  console.log('network event: view move', getViewExtent(view))
+export function handleViewMove() {
+  console.log('network event: view move', getViewExtent())
   socket.emit('message', {
     name: 'moveView',
-    args: getViewExtent(view)
-  }, (data: EnvironmentState) => {
-    console.log(data)
-    handleEnvironmentUpdate(data)
+    args: getViewExtent()
   })
 }
 
 // DOWNSTREAM EVENTS
 
-export function handleEnvironmentUpdate (state: EnvironmentState) {
+export function handleEnvironmentUpdate(state: EnvironmentState) {
   getEnvironment().updateState(state)
 }

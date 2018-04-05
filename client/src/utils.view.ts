@@ -1,5 +1,5 @@
 import {ViewExtent} from './interfaces'
-import {getCanvas, getEngine} from './globals'
+import {getCanvas, getEngine, getScene} from './globals'
 import {CHUNK_SIZE} from '../../shared/src/globals'
 import {updateInputState, isKeyPressed, KeyCode} from './utils.input'
 import {handleViewMove} from './events.network'
@@ -9,11 +9,30 @@ const DEFAULT_VIEW_EXTENT = 220
 // unit per second
 const VIEW_PAN_SPEED = 100
 
+let camera: BABYLON.Camera
+
+/**
+ * Init camera
+ */
+export function initView() {
+  camera = new BABYLON.ArcRotateCamera('main',
+    -Math.PI / 2, Math.PI / 2, 10,
+    new BABYLON.Vector3(16, 16, 0), getScene())
+
+  camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA
+  adjustView(BABYLON.Vector2.Zero(), 1)
+}
+
+export function getCamera(): BABYLON.Camera {
+  return camera
+}
+
+
 /**
  * Set an ortho camera to point a target position with a specified distance
  * note: distance is the factor applied to the default view size
  */
-export function adjustView(camera: BABYLON.Camera, target: BABYLON.Vector2, distance: number) {
+export function adjustView(target: BABYLON.Vector2, distance: number) {
   const canvas = getCanvas()
   const ratio = canvas.width / canvas.height
   let width = DEFAULT_VIEW_EXTENT * distance
@@ -28,14 +47,15 @@ export function adjustView(camera: BABYLON.Camera, target: BABYLON.Vector2, dist
 /**
  * Same but with relative effect (values are added)
  */
-export function adjustViewRelative(camera: BABYLON.Camera, targetDiff: BABYLON.Vector2, distanceDiff: number) {
+export function adjustViewRelative(targetDiff: BABYLON.Vector2, distanceDiff: number) {
   const target = new BABYLON.Vector2(
     targetDiff.x + (camera.orthoLeft + camera.orthoRight) / 2,
     targetDiff.y + (camera.orthoBottom + camera.orthoTop) / 2
   )
-  const distance = distanceDiff +
+  let distance = distanceDiff +
     (camera.orthoRight - camera.orthoLeft) / DEFAULT_VIEW_EXTENT
-  adjustView(camera, target, distance)
+
+  adjustView(target, distance)
 }
 
 
@@ -43,7 +63,7 @@ export function adjustViewRelative(camera: BABYLON.Camera, targetDiff: BABYLON.V
  * Returns an extent (min/max X, min/max Y) from a camera
  * Extent is then rounded on grid chunks
  */
-export function getViewExtent(camera: BABYLON.Camera): ViewExtent {
+export function getViewExtent(): ViewExtent {
   let canvas = getCanvas()
   let ratio = canvas.width / canvas.height
 
@@ -79,7 +99,7 @@ let previousExtent: ViewExtent, newExtent
 /**
  * Run this on the update loop to update the view according to pressed keys
  */
-export function updateView(camera: BABYLON.Camera) {
+export function updateView() {
   // move camera
   viewDiff.scaleInPlace(0)
   const delta = getEngine().getDeltaTime()
@@ -88,12 +108,12 @@ export function updateView(camera: BABYLON.Camera) {
   if (isKeyPressed(KeyCode.LEFT)) viewDiff.x -= 1
   if (isKeyPressed(KeyCode.RIGHT)) viewDiff.x += 1
   viewDiff.scaleInPlace(delta * 0.001 * VIEW_PAN_SPEED)
-  adjustViewRelative(camera, viewDiff, 0)
+  adjustViewRelative(viewDiff, 0)
 
   // check if extent has changed
-  newExtent = getViewExtent(camera)
+  newExtent = getViewExtent()
   if (!previousExtent || compareExtents(newExtent, previousExtent)) {
-    handleViewMove(camera)
+    handleViewMove()
   }
   previousExtent = newExtent
 }
