@@ -3,7 +3,7 @@ import {generateTextMesh, TEXT_ANCHOR} from './mesh.text'
 import {initGlobals, getEngine, getScene, getCanvas} from './globals'
 import {getEnvironment} from './environment'
 import {EnvironmentState} from './interfaces'
-import {encodeMaterialInfo, MATERIAL_HYDROGEN, MATERIAL_MERCURY} from '../../shared/src/materials'
+import * as Materials from '../../shared/src/materials'
 
 export default function init () {
   initGlobals()
@@ -31,8 +31,8 @@ export default function init () {
   tempState.chunks['0 32'] = []
   tempState.chunks['-32 -32'] = []
   for(let i = 0; i < 32*32; i++) {
-    const info = encodeMaterialInfo({
-      class: i > 400 ? MATERIAL_MERCURY : MATERIAL_HYDROGEN,
+    const info = Materials.encodeMaterialInfo({
+      class: i > 400 ? Materials.MATERIAL_LIMESTONE : Materials.MATERIAL_HYDROGEN,
       temperature: 50,
       pressure: 0,
       amount: 100

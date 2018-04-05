@@ -5,3 +5,9 @@ export interface ChunkCollection {
 export interface EnvironmentState {
   chunks: ChunkCollection
 }
+export interface CellInfo {
+  class: number,
+  temperature: number,
+  pressure: number,
+  amount: number
+}

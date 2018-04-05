@@ -1,6 +1,6 @@
 import {pushColoredQuad} from './utils.geom'
 import {getScene} from './globals'
-import {getGenericMaterial} from './materials'
+import {getGenericMaterial, getCellColor} from './mesh.materials'
 import {ChunkInfo} from './interfaces'
 import {decodeMaterialInfo} from '../../shared/src/materials'
 import {CHUNK_SIZE} from '../../shared/src/globals'
@@ -23,6 +23,7 @@ export class GridChunk {
 		this.baseY = baseY
 		this.mesh = new BABYLON.Mesh(`chunk ${baseX} ${baseY}`, getScene())
 		this.mesh.material = getGenericMaterial()
+		this.mesh.visibility = 0.999
 		this.mesh.position.x = baseX
 		this.mesh.position.y = baseY
 		this.cells = []
@@ -46,7 +47,7 @@ export class GridChunk {
 				cell = this.cells[cellIndex]
 				pushColoredQuad(pos, col, ind,
 					x, x + 1, y, y + 1,
-					BABYLON.Color4.FromInts(255, 170, 100, 255)
+					getCellColor(cell)
 				)
 				cellIndex++
 			}

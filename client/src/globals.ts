@@ -5,6 +5,7 @@ let scene: BABYLON.Scene
 export function initGlobals() {
   canvas = document.getElementById("render-target") as HTMLCanvasElement
   engine = new BABYLON.Engine(canvas, true)
+  engine.setDepthBuffer(false)
   scene = new BABYLON.Scene(engine)
 }
 

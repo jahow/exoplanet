@@ -128,6 +128,7 @@ export function generateTextMesh (
   // generate mesh vertices
   mesh.material = bundle.material
   mesh.visibility = 0.9999
+  mesh.renderingGroupId = 3
   const positions: number[] = []
   const colors: number[] = []
   const uvs: number[] = []
