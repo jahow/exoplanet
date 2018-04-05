@@ -1,15 +1,20 @@
 import {ViewExtent} from './interfaces'
-import {getCanvas} from './globals'
+import {getCanvas, getEngine} from './globals'
 import {CHUNK_SIZE} from '../../shared/src/globals'
+import {updateInputState, isKeyPressed, KeyCode} from './utils.input'
+import {handleViewMove} from './events.network'
 
 const DEFAULT_VIEW_EXTENT = 220
+
+// unit per second
+const VIEW_PAN_SPEED = 100
 
 /**
  * Set an ortho camera to point a target position with a specified distance
  * note: distance is the factor applied to the default view size
  */
 export function adjustView(camera: BABYLON.Camera, target: BABYLON.Vector2, distance: number) {
-  const canvas = camera.getEngine().getRenderingCanvas()
+  const canvas = getCanvas()
   const ratio = canvas.width / canvas.height
   let width = DEFAULT_VIEW_EXTENT * distance
   let height = width / ratio
@@ -39,7 +44,7 @@ export function adjustViewRelative(camera: BABYLON.Camera, targetDiff: BABYLON.V
  * Extent is then rounded on grid chunks
  */
 export function getViewExtent(camera: BABYLON.Camera): ViewExtent {
-  let canvas = camera.getEngine().getRenderingCanvas()
+  let canvas = getCanvas()
   let ratio = canvas.width / canvas.height
 
   const extent = {
@@ -56,4 +61,39 @@ export function getViewExtent(camera: BABYLON.Camera): ViewExtent {
   extent.maxY = Math.ceil(extent.maxY / CHUNK_SIZE) * CHUNK_SIZE
 
   return extent
+}
+
+/**
+ * Compare two extents; returns true if different
+ */
+export function compareExtents(extent1: ViewExtent, extent2: ViewExtent): boolean {
+  return extent1.minX !== extent2.minX ||
+    extent1.minY !== extent2.minY ||
+    extent1.maxX !== extent2.maxX ||
+    extent1.maxY !== extent2.maxY
+}
+
+const viewDiff = BABYLON.Vector2.Zero()
+let previousExtent: ViewExtent, newExtent
+
+/**
+ * Run this on the update loop to update the view according to pressed keys
+ */
+export function updateView(camera: BABYLON.Camera) {
+  // move camera
+  viewDiff.scaleInPlace(0)
+  const delta = getEngine().getDeltaTime()
+  if (isKeyPressed(KeyCode.DOWN)) viewDiff.y -= 1
+  if (isKeyPressed(KeyCode.UP)) viewDiff.y += 1
+  if (isKeyPressed(KeyCode.LEFT)) viewDiff.x -= 1
+  if (isKeyPressed(KeyCode.RIGHT)) viewDiff.x += 1
+  viewDiff.scaleInPlace(delta * 0.001 * VIEW_PAN_SPEED)
+  adjustViewRelative(camera, viewDiff, 0)
+
+  // check if extent has changed
+  newExtent = getViewExtent(camera)
+  if (!previousExtent || compareExtents(newExtent, previousExtent)) {
+    handleViewMove(camera)
+  }
+  previousExtent = newExtent
 }

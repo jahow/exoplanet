@@ -4,11 +4,12 @@ import {initGlobals, getEngine, getScene, getCanvas} from './globals'
 import {getEnvironment} from './environment'
 import {EnvironmentState} from './interfaces'
 import * as Materials from '../../shared/src/materials'
-import {handleViewMove} from './events.network'
-import {adjustView, adjustViewRelative} from './utils.view'
+import {adjustView, adjustViewRelative, updateView} from './utils.view'
+import {initInput, updateInputState} from './utils.input'
 
 export default function init () {
   initGlobals()
+  initInput()
 
   // Create the camera
   const camera = new BABYLON.ArcRotateCamera('main',
@@ -19,11 +20,8 @@ export default function init () {
   adjustView(camera, BABYLON.Vector2.Zero(), 1)
   window.onresize = () => {
     getEngine().resize()
-    adjustView(camera, BABYLON.Vector2.Zero(), 1)
+    adjustViewRelative(camera, BABYLON.Vector2.Zero(), 0)
   }
-
-  // TODO: write custom camera code & call handleViewMove whith a debounce
-  handleViewMove(camera)
 
   // getScene().debugLayer.show()
 
@@ -32,8 +30,13 @@ export default function init () {
   generateTextMesh('monospace', 'normal', 'origin',
       6, new BABYLON.Vector2(16, 16), TEXT_ANCHOR.CENTER)
 
+  const viewDiff = BABYLON.Vector2.Zero()
+
   getEngine().runRenderLoop(function () {
     graticule.update()
+    updateInputState()
+    updateView(camera)
+
     getScene().render()
   })
 }
