@@ -1,5 +1,5 @@
 import {pushColoredQuad} from './utils.geom'
-import {getViewExtent} from './utils.misc'
+import {getViewExtent} from './utils.view'
 import {getGenericMaterial} from './mesh.materials'
 import {generateTextMesh, TEXT_ANCHOR} from './mesh.text'
 import {getScene} from './globals'

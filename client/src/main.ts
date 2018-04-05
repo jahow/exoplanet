@@ -5,6 +5,7 @@ import {getEnvironment} from './environment'
 import {EnvironmentState} from './interfaces'
 import * as Materials from '../../shared/src/materials'
 import {handleViewMove} from './events.network'
+import {adjustView, adjustViewRelative} from './utils.view'
 
 export default function init () {
   initGlobals()
@@ -15,10 +16,11 @@ export default function init () {
     new BABYLON.Vector3(16, 16, 0), getScene())
 
   camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA
-  camera.orthoBottom = -100
-  camera.orthoTop = 100
-  camera.orthoLeft = -100
-  camera.orthoRight = 100
+  adjustView(camera, BABYLON.Vector2.Zero(), 1)
+  window.onresize = () => {
+    getEngine().resize()
+    adjustView(camera, BABYLON.Vector2.Zero(), 1)
+  }
 
   // TODO: write custom camera code & call handleViewMove whith a debounce
   handleViewMove(camera)

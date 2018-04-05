@@ -3,7 +3,7 @@ import init from './main'
 import {CHUNK_SIZE} from '../../shared/src/globals'
 import {getEnvironment} from './environment'
 import {EnvironmentState} from './interfaces'
-import {getViewExtent} from './utils.misc'
+import {getViewExtent} from './utils.view'
 
 // socket init
 const socket = io()
