@@ -11,3 +11,9 @@ export interface CellInfo {
   pressure: number,
   amount: number
 }
+export interface ViewExtent {
+	minX: number,
+	maxX: number,
+	minY: number,
+	maxY: number
+}

@@ -1,4 +1,5 @@
 import {pushColoredQuad} from './utils.geom'
+import {getViewExtent} from './utils.misc'
 import {getGenericMaterial} from './mesh.materials'
 import {generateTextMesh, TEXT_ANCHOR} from './mesh.text'
 import {getScene} from './globals'
@@ -28,27 +29,14 @@ export default class Graticule {
 
   update () {
     // compute view extent
-    // TODO: ACTuALLY COMPUTE SOMETHING IDIOT
-    let x = this.camera.target.x
-    let y = this.camera.target.y
-    let width = this.camera.radius
-    let height = this.camera.radius
+    const extent = getViewExtent(this.camera)
 
-    let minX = x - width / 2
-    minX = Math.floor(minX / CHUNK_SIZE) * CHUNK_SIZE
-    let minY = y - height / 2
-    minY = Math.floor(minY / CHUNK_SIZE) * CHUNK_SIZE
-    let maxX = x + width / 2
-    maxX = Math.ceil(maxX / CHUNK_SIZE) * CHUNK_SIZE
-    let maxY = y + height / 2
-    maxY = Math.ceil(maxY / CHUNK_SIZE) * CHUNK_SIZE
-
-    if (minX !== this.minX || this.minY !== minY ||
-        maxX !== this.maxX || this.maxY !== maxY) {
-      this.minX = minX
-      this.minY = minY
-      this.maxX = maxX
-      this.maxY = maxY
+    if (extent.minX !== this.minX || this.minY !== extent.minY ||
+        extent.maxX !== this.maxX || this.maxY !== extent.maxY) {
+      this.minX = extent.minX
+      this.minY = extent.minY
+      this.maxX = extent.maxX
+      this.maxY = extent.maxY
 
       this.rebuildMesh()
     }

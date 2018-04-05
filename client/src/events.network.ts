@@ -1,8 +1,9 @@
-import io from 'socket.io-client'
+import * as io from 'socket.io-client'
 import init from './main'
 import {CHUNK_SIZE} from '../../shared/src/globals'
 import {getEnvironment} from './environment'
 import {EnvironmentState} from './interfaces'
+import {getViewExtent} from './utils.misc'
 
 // socket init
 const socket = io()
@@ -14,15 +15,10 @@ socket.on('connect', () => {
 // UPSTREAM EVENTS
 
 export function handleViewMove (view: BABYLON.Camera) {
-  console.log('network event: view move')
+  console.log('network event: view move', getViewExtent(view))
   socket.emit('message', {
     name: 'moveView',
-    args: {
-      minX: -100,
-      maxX: 100,
-      minY: -100,
-      maxY: 100
-    }
+    args: getViewExtent(view)
   }, (data: EnvironmentState) => {
     console.log(data)
     handleEnvironmentUpdate(data)

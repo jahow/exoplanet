@@ -4,15 +4,24 @@ import {initGlobals, getEngine, getScene, getCanvas} from './globals'
 import {getEnvironment} from './environment'
 import {EnvironmentState} from './interfaces'
 import * as Materials from '../../shared/src/materials'
+import {handleViewMove} from './events.network'
 
 export default function init () {
   initGlobals()
 
   // Create the camera
   const camera = new BABYLON.ArcRotateCamera('main',
-    -Math.PI / 2, Math.PI / 2, 100,
+    -Math.PI / 2, Math.PI / 2, 10,
     new BABYLON.Vector3(16, 16, 0), getScene())
-  camera.attachControl(getCanvas())
+
+  camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA
+  camera.orthoBottom = -100
+  camera.orthoTop = 100
+  camera.orthoLeft = -100
+  camera.orthoRight = 100
+
+  // TODO: write custom camera code & call handleViewMove whith a debounce
+  handleViewMove(camera)
 
   // getScene().debugLayer.show()
 
@@ -20,30 +29,6 @@ export default function init () {
 
   generateTextMesh('monospace', 'normal', 'origin',
       6, new BABYLON.Vector2(16, 16), TEXT_ANCHOR.CENTER)
-
-  // integrate a default state
-  const tempState: EnvironmentState = {
-    chunks: {}
-  }
-  tempState.chunks['0 0'] = []
-  tempState.chunks['32 0'] = []
-  tempState.chunks['32 32'] = []
-  tempState.chunks['0 32'] = []
-  tempState.chunks['-32 -32'] = []
-  for(let i = 0; i < 32*32; i++) {
-    const info = Materials.encodeMaterialInfo({
-      class: i > 400 ? Materials.MATERIAL_LIMESTONE : Materials.MATERIAL_HYDROGEN,
-      temperature: 50,
-      pressure: 0,
-      amount: 100
-    })
-    tempState.chunks['0 0'].push(info)
-    tempState.chunks['32 0'].push(info)
-    tempState.chunks['32 32'].push(info)
-    tempState.chunks['0 32'].push(info)
-    tempState.chunks['-32 -32'].push(info)
-  }
-  getEnvironment().updateState(tempState)
 
   getEngine().runRenderLoop(function () {
     graticule.update()
