@@ -2,7 +2,7 @@
   "name": "exoplanet",
   "version": "0.0.1",
   "description": "a new world awaits",
-  "main": "server.js",
+  "main": "server/dist/bundle.js",
   "author": "gangreforge team",
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -19,16 +19,19 @@
     "@babel/preset-env": "^7.0.0-beta.40",
     "@types/babylonjs": "^2.4.1",
     "babel-loader": "^8.0.0-beta.0",
+    "nodemon": "^1.17.3",
+    "npm-run-all": "^4.1.2",
     "standard": "^10.0.3",
     "ts-loader": "^4.0.1",
     "typescript": "^2.7.2",
     "webpack": "^4.0.1",
-    "webpack-cli": "^2.0.9",
-    "webpack-dev-server": "^3.1.1"
+    "webpack-cli": "^2.0.9"
   },
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "dev": "webpack-dev-server --config webpack.config.js --watch --debug",
+    "watch-build": "webpack --config webpack.config.js --watch",
+    "watch-restart": "nodemon --watch server/dist/bundle.js",
+    "dev": "npm-run-all -p watch-build watch-restart",
     "start": "npm run build && node ./server/dist/bundle.js"
   },
   "globals": [
