@@ -1,5 +1,6 @@
 import Environment, { ENVIRONMENT_TYPE_DEFAULT } from './environment'
-import { getTime, capExtent } from './utility'
+import { getTime, capExtent, compareExtents } from './utility'
+import {sendMessage} from './network'
 
 // in meters
 const MAX_EXTENT_SIZE = 1000
@@ -57,7 +58,13 @@ class Simulation {
   // once set here, an extent is always assumed to be valid
   setViewExtent (viewerId, extent) {
     const v = this.getViewer(viewerId)
-    v.viewExtent = capExtent(extent, MAX_EXTENT_SIZE)
+    const newExtent = capExtent(extent, MAX_EXTENT_SIZE)
+    if (!v.viewExtent || compareExtents(newExtent, v.viewExtent)) {
+      v.viewExtent = newExtent
+      sendMessage(viewerId, 'environmentState',
+        this.environment.getState(newExtent.minX, newExtent.maxX, newExtent.minY, newExtent.maxY)
+      )
+    }
     return v.viewExtent
   }
 }
@@ -76,17 +83,9 @@ export function registerViewer (id) {
 
 // might return something
 export function handleMessage (senderId, message, args) {
-  console.log('handling message ' + message + ' from ' + senderId)
-
   switch (message) {
     case 'moveView':
       const extent = sim.setViewExtent(senderId, args)
-      // console.log(extent)
-      return {
-        chunks: sim.getEnvironment().getGridChunks(
-          extent.minX, extent.maxX, extent.minY, extent.maxY,
-          true)
-      }
     case 'alterGridCell':
       // return
   }

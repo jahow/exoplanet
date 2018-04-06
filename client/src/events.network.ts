@@ -12,6 +12,14 @@ socket.on('connect', () => {
   console.log('connected as ' + socket.id)
 })
 
+socket.on('message', (message: any) => {
+  switch(message.name) {
+    case 'environmentState':
+      handleEnvironmentUpdate(message.args)
+      break;
+  }
+})
+
 // UPSTREAM EVENTS
 
 export function handleViewMove() {
@@ -25,5 +33,6 @@ export function handleViewMove() {
 // DOWNSTREAM EVENTS
 
 export function handleEnvironmentUpdate(state: EnvironmentState) {
+  console.log('network event: environment state', state)
   getEnvironment().updateState(state)
 }

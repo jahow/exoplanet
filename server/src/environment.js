@@ -1,4 +1,5 @@
-import Grid, { CHUNK_SIZE } from './grid'
+import Grid from './grid'
+import {CHUNK_SIZE} from '../../shared/src/globals'
 import * as Materials from '../../shared/src/materials'
 
 // a grid cell is the unit of measure ie 1 meter
@@ -47,6 +48,12 @@ class Environment {
       }
     }
     return this.grid.getChunks(coords, encoded)
+  }
+
+  getState (minX, maxX, minY, maxY) {
+    return {
+      chunks: this.getGridChunks(minX, maxX, minY, maxY, true)
+    }
   }
 }
 

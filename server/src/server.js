@@ -1,12 +1,11 @@
-import { startSimulation, registerViewer, handleMessage } from './simulation'
-import socketio from 'socket.io'
+import {startSimulation} from './simulation'
+import {initNetwork} from './network'
 
 // SETUP
 const express = require('express')
 const app = express()
 
 const http = require('http').Server(app)
-const io = socketio(http)
 const path = require('path')
 const argv = require('minimist')(process.argv)
 
@@ -25,29 +24,7 @@ app.use(function (req, res, next) {
   res.status(404).send('file not found')
 })
 
-// SOCKETS
-io.on('connection', function (socket) {
-  console.log('user ' + socket.id + ' connected')
-
-  socket.on('disconnect', function () {
-    console.log('user ' + socket.id + ' disconnected')
-  })
-
-  // register this viewer in the sim
-  registerViewer(socket.id)
-
-  // all messages are handled by the sim
-  // expected message structure is:
-  // {
-  //   name: string,
-  //   args: { object }
-  // }
-  // send the result if a confirmation callback was given
-  socket.on('message', (msg, callback) => {
-    const res = handleMessage(socket.id, msg.name, msg.args)
-    callback && callback(res)
-  })
-})
+initNetwork(http)
 
 // SERVER LAUNCH
 var port = parseInt(argv.port) || parseInt(argv.p) || 8080
