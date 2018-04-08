@@ -17,6 +17,7 @@ export class GridChunk {
 	baseY: number
 	mesh: BABYLON.Mesh
 	cells: GridCell[]
+	revision: number
 
 	constructor(baseX: number, baseY: number) {
 		this.baseX = baseX
@@ -27,12 +28,18 @@ export class GridChunk {
 		this.mesh.position.x = baseX
 		this.mesh.position.y = baseY
 		this.cells = []
+		this.revision = -1
 	}
 
 	updateChunk(encodedChunkInfo: ChunkInfo) {
-		encodedChunkInfo.forEach((cell, index) => {
-			this.cells[index] = decodeMaterialInfo(cell)
-		})
+		const revision = encodedChunkInfo[encodedChunkInfo.length - 1]
+		if (revision === this.revision) { return }
+
+		this.revision = revision
+
+		for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
+			this.cells[i] = decodeMaterialInfo(encodedChunkInfo[i])
+		}
 
 		this.generateMesh()
 	}
