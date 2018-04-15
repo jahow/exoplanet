@@ -4,12 +4,14 @@ import {CHUNK_SIZE} from '../../shared/src/globals'
 import {updateInputState, isKeyPressed, KeyCode} from './utils.input'
 import {handleViewMove} from './events.network'
 
-const DEFAULT_VIEW_EXTENT = 220
+const DEFAULT_VIEW_RESOLUTION = 0.25    // meters per pixel
 
 // unit per second
 const VIEW_PAN_SPEED = 100
 
 let camera: BABYLON.Camera
+let currentTarget = BABYLON.Vector2.Zero()
+let currentResolution = DEFAULT_VIEW_RESOLUTION
 
 /**
  * Init camera
@@ -20,42 +22,54 @@ export function initView() {
     new BABYLON.Vector3(16, 16, 0), getScene())
 
   camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA
-  adjustView(BABYLON.Vector2.Zero(), 1)
+  moveView(BABYLON.Vector2.Zero())
 }
 
 export function getCamera(): BABYLON.Camera {
   return camera
 }
 
+function updateCameraParams() {
+  const canvas = getCanvas()
+  let width = canvas.width * currentResolution
+  let height = canvas.height * currentResolution
+  let targetX = currentTarget.x
+  let targetY = currentTarget.y
+
+  const floor = (a: number) => Math.floor(a / currentResolution) * currentResolution
+
+  camera.orthoBottom = floor(targetY - height / 2)
+  camera.orthoTop = floor(targetY + height / 2)
+  camera.orthoLeft = floor(targetX - width / 2)
+  camera.orthoRight = floor(targetX + width / 2)
+}
 
 /**
- * Set an ortho camera to point a target position with a specified distance
- * note: distance is the factor applied to the default view size
+ * Set an ortho camera to point a target position
  */
-export function adjustView(target: BABYLON.Vector2, distance: number) {
-  const canvas = getCanvas()
-  const ratio = canvas.width / canvas.height
-  let width = DEFAULT_VIEW_EXTENT * distance
-  let height = width / ratio
+export function moveView(target: BABYLON.Vector2) {
+  currentTarget.set(target.x, target.y)
+  updateCameraParams()
+}
 
-  camera.orthoBottom = target.y - height / 2
-  camera.orthoTop = target.y + height / 2
-  camera.orthoLeft = target.x - width / 2
-  camera.orthoRight = target.x + width / 2
+/**
+ * Set an ortho camera to the specified resolution
+ */
+export function setResolution(resolution: number) {
+  currentResolution = resolution
+  updateCameraParams()
 }
 
 /**
  * Same but with relative effect (values are added)
  */
-export function adjustViewRelative(targetDiff: BABYLON.Vector2, distanceDiff: number) {
+export function moveViewRelative(targetDiff: BABYLON.Vector2) {
   const target = new BABYLON.Vector2(
-    targetDiff.x + (camera.orthoLeft + camera.orthoRight) / 2,
-    targetDiff.y + (camera.orthoBottom + camera.orthoTop) / 2
+    targetDiff.x + currentTarget.x,
+    targetDiff.y + currentTarget.y
   )
-  let distance = distanceDiff +
-    (camera.orthoRight - camera.orthoLeft) / DEFAULT_VIEW_EXTENT
 
-  adjustView(target, distance)
+  moveView(target)
 }
 
 
@@ -107,8 +121,8 @@ export function updateView() {
   if (isKeyPressed(KeyCode.UP)) viewDiff.y += 1
   if (isKeyPressed(KeyCode.LEFT)) viewDiff.x -= 1
   if (isKeyPressed(KeyCode.RIGHT)) viewDiff.x += 1
-  viewDiff.scaleInPlace(delta * 0.001 * VIEW_PAN_SPEED)
-  adjustViewRelative(viewDiff, 0)
+  viewDiff.scaleInPlace(delta * 0.0011 * VIEW_PAN_SPEED)
+  moveViewRelative(viewDiff)
 
   // check if extent has changed
   newExtent = getViewExtent()
