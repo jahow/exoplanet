@@ -33,6 +33,7 @@ export default function init () {
     }
 
     graticule.update()
+
     updateInputState()
     updateView()
 

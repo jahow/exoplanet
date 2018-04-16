@@ -4,6 +4,7 @@ import {getGenericMaterial} from './mesh.materials'
 import {generateTextMesh, TEXT_ANCHOR} from './mesh.text'
 import {getScene} from './globals'
 import {CHUNK_SIZE} from '../../shared/src/globals'
+import {getDebugMode} from './utils.misc'
 
 export default class Graticule {
   positions: number[]
@@ -13,19 +14,31 @@ export default class Graticule {
   maxX: number
   minY: number
   maxY: number
+  rootMesh: BABYLON.Mesh
   mesh: BABYLON.Mesh
   textMeshes: BABYLON.Mesh[]
 
   constructor () {
+    this.rootMesh = new BABYLON.Mesh('graticule root', getScene())
+
     this.mesh = new BABYLON.Mesh('graticule', getScene())
     this.mesh.material = getGenericMaterial()
     this.mesh.visibility = 0.9999  // triggers alpha blending
     this.mesh.renderingGroupId = 3
     this.mesh.isPickable = false
+    this.mesh.parent = this.rootMesh
+
     this.textMeshes = []
   }
 
   update () {
+    if (!getDebugMode()) {
+      this.rootMesh.setEnabled(false)
+      return
+    }
+
+    this.rootMesh.setEnabled(true)
+
     // compute view extent
     const extent = getViewExtent()
 
@@ -50,6 +63,8 @@ export default class Graticule {
     this.colors = []
     this.indices = []
 
+    let text
+
     for (let x = this.minX; x <= this.maxX + CHUNK_SIZE; x += CHUNK_SIZE) {
       for (let y = this.minY; y <= this.maxY + CHUNK_SIZE; y += CHUNK_SIZE) {
         pushColoredQuad(this.positions, this.colors, this.indices,
@@ -60,11 +75,13 @@ export default class Graticule {
           BABYLON.Color4.FromInts(255, 255, 255, 100))
 
         // text mesh
-        this.textMeshes.push(
-          generateTextMesh('monospace', 'normal', `${x},${y}`,
-            4, new BABYLON.Vector2(x + 2, y + 2), TEXT_ANCHOR.BOTTOMLEFT,
-            BABYLON.Color4.FromInts(255, 255, 255, 100))
-         )
+        // TODO: optimize this to reduce the performance hit
+        text = generateTextMesh('monospace', 'normal', `${x},${y}`,
+          4, new BABYLON.Vector2(x + 2, y + 2), TEXT_ANCHOR.BOTTOMLEFT,
+          BABYLON.Color4.FromInts(255, 255, 255, 100))
+        text.parent = this.rootMesh
+
+        this.textMeshes.push(text)
       } 
     }
 
