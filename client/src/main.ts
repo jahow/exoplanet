@@ -7,6 +7,7 @@ import * as Materials from '../../shared/src/materials'
 import {initView, updateView} from './utils.view'
 import {initInput, updateInputState, isKeyPressed} from './utils.input'
 import {toggleDebugMode} from './utils.misc'
+import {updateJobQueue} from './utils.jobs'
 
 export default function init () {
   initGlobals()
@@ -28,9 +29,9 @@ export default function init () {
     }
 
     graticule.update()
-
     updateInputState()
     updateView()
+    updateJobQueue()
 
     getScene().render()
 

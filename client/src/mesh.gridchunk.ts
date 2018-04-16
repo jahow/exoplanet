@@ -4,6 +4,7 @@ import {getGenericMaterial, getCellColor} from './mesh.materials'
 import {ChunkInfo} from './interfaces'
 import {decodeMaterialInfo} from '../../shared/src/materials'
 import {CHUNK_SIZE} from '../../shared/src/globals'
+import {addJobToQueue} from './utils.jobs'
 
 export interface GridCell {
   class: number,
@@ -42,7 +43,9 @@ export class GridChunk {
 			this.cells[i] = decodeMaterialInfo(encodedChunkInfo[i])
 		}
 
-		this.generateMesh()
+		addJobToQueue(() => {
+			this.generateMesh()
+		}, this)
 	}
 
 	generateMesh() {
@@ -64,8 +67,6 @@ export class GridChunk {
     this.mesh.setVerticesData(BABYLON.VertexBuffer.PositionKind, pos, true);
     this.mesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, col, true);
     this.mesh.setIndices(ind, pos.length / 3, true)
-
-    console.log('generated chunk mesh')
 	}
 
 	dispose() {
