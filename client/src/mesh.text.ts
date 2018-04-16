@@ -46,7 +46,7 @@ function generateFontBundle (
   const texture = new BABYLON.DynamicTexture('glyphs', {
       width: textureSize,
       height: textureSize
-    }, getScene(), true)
+    }, getScene(), false)
   const ctx = texture.getContext()
   ctx.font = fontWeight + ' ' + fontSize + 'px ' + fontFamily
   ctx.textBaseline = 'middle'
@@ -86,8 +86,8 @@ function generateFontBundle (
   texture.update()
 
   textMaterial.setTexture('glyphAtlas', texture)
-  textMaterial.setFloat('buffer', 0.75)
-  textMaterial.setFloat('gamma', 0.1)
+  textMaterial.setFloat('buffer', 0.68)
+  textMaterial.setFloat('gamma', 0.13)
 
   return {
     material: textMaterial,
