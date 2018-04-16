@@ -21,11 +21,6 @@ export default function init () {
 
   const graticule = new Graticule()
 
-  generateTextMesh('monospace', 'normal', 'origin',
-      6, new BABYLON.Vector2(16, 16), TEXT_ANCHOR.CENTER)
-
-  const viewDiff = BABYLON.Vector2.Zero()
-
   getEngine().runRenderLoop(function () {
     // debug mode
     if (isKeyPressed('*', true)) {

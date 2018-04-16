@@ -29,6 +29,10 @@ export default class Graticule {
     this.mesh.parent = this.rootMesh
 
     this.textMeshes = []
+
+    const originMesh = generateTextMesh('monospace', 'normal', 'origin',
+      6, new BABYLON.Vector2(16, 16), TEXT_ANCHOR.CENTER)
+    originMesh.parent = this.rootMesh
   }
 
   update () {
