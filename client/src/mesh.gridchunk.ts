@@ -27,6 +27,7 @@ export class GridChunk {
 		this.mesh.visibility = 0.999
 		this.mesh.position.x = baseX
 		this.mesh.position.y = baseY
+		this.mesh.isPickable = false
 		this.cells = []
 		this.revision = -1
 	}
@@ -63,6 +64,8 @@ export class GridChunk {
     this.mesh.setVerticesData(BABYLON.VertexBuffer.PositionKind, pos, true);
     this.mesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, col, true);
     this.mesh.setIndices(ind, pos.length / 3, true)
+
+    console.log('generated chunk mesh')
 	}
 
 	dispose() {

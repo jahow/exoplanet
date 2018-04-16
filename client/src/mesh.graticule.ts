@@ -21,6 +21,7 @@ export default class Graticule {
     this.mesh.material = getGenericMaterial()
     this.mesh.visibility = 0.9999  // triggers alpha blending
     this.mesh.renderingGroupId = 3
+    this.mesh.isPickable = false
     this.textMeshes = []
   }
 
@@ -49,8 +50,8 @@ export default class Graticule {
     this.colors = []
     this.indices = []
 
-    for (let x = this.minX; x <= this.maxX; x += CHUNK_SIZE) {
-      for (let y = this.minY; y <= this.maxY; y += CHUNK_SIZE) {
+    for (let x = this.minX; x <= this.maxX + CHUNK_SIZE; x += CHUNK_SIZE) {
+      for (let y = this.minY; y <= this.maxY + CHUNK_SIZE; y += CHUNK_SIZE) {
         pushColoredQuad(this.positions, this.colors, this.indices,
           x - 1, x, y - 4.5, y + 3.5,
           BABYLON.Color4.FromInts(255, 255, 255, 100))

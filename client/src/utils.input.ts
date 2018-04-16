@@ -34,7 +34,8 @@ export enum KeyCode {
 
 enum KeyState {
   RELEASED,
-  PRESSED
+  PRESSED,
+  FIRST_PRESSED
 }
 interface GlobalInputState {
   keyboard: {[key: string]: KeyState},
@@ -48,7 +49,12 @@ const inputState: GlobalInputState = {
 export function initInput() {
   // bind events
   window.addEventListener('keydown', evt => {
-    inputState.keyboard[evt.keyCode] = KeyState.PRESSED
+    // use keycode if key is not a single char
+    if (evt.key.length === 1) {
+      inputState.keyboard[evt.key] = KeyState.FIRST_PRESSED 
+    } else {
+      inputState.keyboard[evt.keyCode] = KeyState.FIRST_PRESSED 
+    }
   })
   window.addEventListener('keyup', evt => {
     inputState.keyboard[evt.keyCode] = KeyState.RELEASED
@@ -56,11 +62,14 @@ export function initInput() {
 }
 
 export function updateInputState() {
-  // Object.keys(inputState.keyboard).forEach(key => {
-  //  inputState.keyboard[key] = KeyState.RELEASED
-  // })
+  Object.keys(inputState.keyboard).forEach(key => {
+    if (inputState.keyboard[key] === KeyState.FIRST_PRESSED) {
+      inputState.keyboard[key] = KeyState.PRESSED
+    }
+  })
 }
 
-export function isKeyPressed(keyCode: KeyCode) {
-  return inputState.keyboard[keyCode] === KeyState.PRESSED
+export function isKeyPressed(key: KeyCode | string, firstPressed?: boolean) {
+  return (!firstPressed && inputState.keyboard[key] === KeyState.PRESSED) ||
+    inputState.keyboard[key] === KeyState.FIRST_PRESSED
 }

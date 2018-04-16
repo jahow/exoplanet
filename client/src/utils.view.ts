@@ -3,6 +3,7 @@ import {getCanvas, getEngine, getScene} from './globals'
 import {CHUNK_SIZE} from '../../shared/src/globals'
 import {updateInputState, isKeyPressed, KeyCode} from './utils.input'
 import {handleViewMove} from './events.network'
+import {getDebugMode} from './utils.misc'
 
 const DEFAULT_VIEW_RESOLUTION = 0.25    // meters per pixel
 
@@ -37,6 +38,11 @@ function updateCameraParams() {
   let targetY = currentTarget.y
 
   const floor = (a: number) => Math.floor(a / currentResolution) * currentResolution
+
+  if (getDebugMode()) {
+    width *= 2
+    height *= 2
+  }
 
   camera.orthoBottom = floor(targetY - height / 2)
   camera.orthoTop = floor(targetY + height / 2)
@@ -78,14 +84,17 @@ export function moveViewRelative(targetDiff: BABYLON.Vector2) {
  * Extent is then rounded on grid chunks
  */
 export function getViewExtent(): ViewExtent {
-  let canvas = getCanvas()
-  let ratio = canvas.width / canvas.height
+  const canvas = getCanvas()
+  let width = canvas.width * currentResolution
+  let height = canvas.height * currentResolution
+  let targetX = currentTarget.x
+  let targetY = currentTarget.y
 
   const extent = {
-    minX: camera.orthoLeft,
-    maxX: camera.orthoRight,
-    minY: camera.orthoBottom,
-    maxY: camera.orthoTop
+    minX: targetX - width / 2,
+    maxX: targetX + width / 2,
+    minY: targetY - height / 2,
+    maxY: targetY + height / 2
   }
 
   // round on chunks

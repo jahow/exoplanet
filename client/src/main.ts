@@ -5,7 +5,8 @@ import {getEnvironment} from './environment'
 import {EnvironmentState} from './interfaces'
 import * as Materials from '../../shared/src/materials'
 import {initView, updateView} from './utils.view'
-import {initInput, updateInputState} from './utils.input'
+import {initInput, updateInputState, isKeyPressed} from './utils.input'
+import {toggleDebugMode} from './utils.misc'
 
 export default function init () {
   initGlobals()
@@ -26,10 +27,16 @@ export default function init () {
   const viewDiff = BABYLON.Vector2.Zero()
 
   getEngine().runRenderLoop(function () {
+    // debug mode
+    if (isKeyPressed('*', true)) {
+      toggleDebugMode()
+    }
+
     graticule.update()
     updateInputState()
     updateView()
 
     getScene().render()
+
   })
 }
