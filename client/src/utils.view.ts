@@ -4,6 +4,7 @@ import {CHUNK_SIZE} from '../../shared/src/globals'
 import {updateInputState, isKeyPressed, KeyCode} from './utils.input'
 import {handleViewMove} from './events.network'
 import {getDebugMode} from './utils.misc'
+import {compareExtents} from '../../shared/src/view-extent'
 
 const DEFAULT_VIEW_RESOLUTION = 0.25    // meters per pixel
 
@@ -104,16 +105,6 @@ export function getViewExtent(): ViewExtent {
   extent.maxY = Math.ceil(extent.maxY / CHUNK_SIZE) * CHUNK_SIZE
 
   return extent
-}
-
-/**
- * Compare two extents; returns true if different
- */
-export function compareExtents(extent1: ViewExtent, extent2: ViewExtent): boolean {
-  return extent1.minX !== extent2.minX ||
-    extent1.minY !== extent2.minY ||
-    extent1.maxX !== extent2.maxX ||
-    extent1.maxY !== extent2.maxY
 }
 
 const viewDiff = BABYLON.Vector2.Zero()

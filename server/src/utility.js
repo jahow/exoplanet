@@ -20,10 +20,3 @@ export function capExtent (extent, maxSize) {
     maxY: Math.floor(centerY + sizeY / 2)
   }
 }
-
-export function compareExtents (extent1, extent2) {
-  return extent1.minX !== extent2.minX ||
-    extent1.minY !== extent2.minY ||
-    extent1.maxX !== extent2.maxX ||
-    extent1.maxY !== extent2.maxY
-}

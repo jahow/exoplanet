@@ -9,7 +9,9 @@ class Grid {
     this.cellCallback = generateCellCallback
   }
 
-  getChunk (baseX, baseY) {
+  getChunk (x, y) {
+    const baseX = Math.floor(x / CHUNK_SIZE) * CHUNK_SIZE
+    const baseY = Math.floor(y / CHUNK_SIZE) * CHUNK_SIZE
     const saved = this.savedChunks[`${baseX} ${baseY}`]
     return saved || this.generateChunk(baseX, baseY)
   }

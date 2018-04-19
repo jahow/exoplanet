@@ -1,6 +1,7 @@
-import Environment, { ENVIRONMENT_TYPE_DEFAULT } from './environment'
-import { getTime, capExtent, compareExtents } from './utility'
+import Environment, {ENVIRONMENT_TYPE_DEFAULT} from './environment'
+import {getTime, capExtent} from './utility'
 import {sendMessage} from './network'
+import {compareExtents} from '../../shared/src/view-extent'
 
 // in meters
 const MAX_EXTENT_SIZE = 1000
@@ -44,7 +45,7 @@ class Simulation {
       return
     }
     this.viewers[id] = {
-      viewExtent: null
+      viewExtent: { minX: 0, maxX: -1, minY: 0, maxY: -1 }
     }
   }
 
@@ -59,11 +60,11 @@ class Simulation {
   setViewExtent (viewerId, extent) {
     const v = this.getViewer(viewerId)
     const newExtent = capExtent(extent, MAX_EXTENT_SIZE)
-    if (!v.viewExtent || compareExtents(newExtent, v.viewExtent)) {
-      v.viewExtent = newExtent
+    if (compareExtents(newExtent, v.viewExtent)) {
       sendMessage(viewerId, 'environmentState',
-        this.environment.getState(newExtent.minX, newExtent.maxX, newExtent.minY, newExtent.maxY)
+        this.environment.getPartialState(newExtent, v.viewExtent)
       )
+      v.viewExtent = newExtent
     }
     return v.viewExtent
   }
