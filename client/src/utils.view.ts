@@ -4,7 +4,9 @@ import {CHUNK_SIZE} from '../../shared/src/globals'
 import {updateInputState, isKeyPressed, KeyCode} from './utils.input'
 import {handleViewMove} from './events.network'
 import {getDebugMode} from './utils.misc'
-import {compareExtents} from '../../shared/src/view-extent'
+import {compareExtents, addBufferToExtent, copyExtent,
+  getChunksBySubtractingExtents} from '../../shared/src/view-extent'
+import {getEnvironment} from './environment'
 
 const DEFAULT_VIEW_RESOLUTION = 0.25    // meters per pixel
 
@@ -108,7 +110,8 @@ export function getViewExtent(): ViewExtent {
 }
 
 const viewDiff = BABYLON.Vector2.Zero()
-let previousExtent: ViewExtent, newExtent
+let previousExtent: ViewExtent, newExtent: ViewExtent
+let previousBuffered: ViewExtent, newBuffered: ViewExtent
 
 /**
  * Run this on the update loop to update the view according to pressed keys
@@ -129,5 +132,20 @@ export function updateView() {
   if (!previousExtent || compareExtents(newExtent, previousExtent)) {
     handleViewMove()
   }
+
+  // release meshes outside of previous extent (with buffer)
+  if (previousExtent) {
+    previousBuffered = copyExtent(previousExtent, previousBuffered)
+    addBufferToExtent(previousBuffered, CHUNK_SIZE * 3)
+    newBuffered = copyExtent(newExtent, newBuffered)
+    addBufferToExtent(newBuffered, CHUNK_SIZE * 3)
+    const toRelease = getChunksBySubtractingExtents(newBuffered, previousBuffered)
+    const grid = getEnvironment().getGrid()
+    toRelease.forEach(coord => {
+      grid.removeChunkByKey(`${coord[0]} ${coord[1]}`)
+    })
+  }
+
+  // copy extent
   previousExtent = newExtent
 }

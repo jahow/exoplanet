@@ -50,3 +50,28 @@ export function getChunksBySubtractingExtents (extent1, extent2) {
   }
   return coords
 }
+
+/**
+ * Adds a buffer on an extent
+ */
+export function addBufferToExtent (extent, buffer) {
+  extent.minX -= buffer
+  extent.maxX += buffer
+  extent.minY -= buffer
+  extent.maxY += buffer
+  return extent
+}
+
+/**
+ * Copy extent1 into extent2; can initialize an object
+ */
+export function copyExtent (extent1, extent2) {
+  if (!extent2) {
+    extent2 = {}
+  }
+  extent2.minX = extent1.minX
+  extent2.maxX = extent1.maxX
+  extent2.minY = extent1.minY
+  extent2.maxY = extent1.maxY
+  return extent2
+}

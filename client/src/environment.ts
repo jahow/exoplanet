@@ -11,6 +11,10 @@ export default class Environment {
   updateState(state: EnvironmentState) {
     this.grid.updateChunks(state.chunks)
   }
+
+  getGrid() {
+    return this.grid
+  }
 }
 
 let environment: Environment

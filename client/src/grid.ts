@@ -29,4 +29,14 @@ export default class Grid {
     }
     return this.chunks[key]
   }
+
+  /**
+   * Remove chunk with the given key (ie dispose mesh)
+   */
+  removeChunkByKey(key: string) {
+    if (this.chunks[key]) {
+      this.chunks[key].dispose()
+      this.chunks[key] = undefined
+    }
+  }
 }
