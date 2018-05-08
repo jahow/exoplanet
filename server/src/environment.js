@@ -34,11 +34,10 @@ class Environment {
   }
 
   cellGenerationCallback (x, y) {
-    let groundHeight = 120 * NoiseGenerator.perlin(0.002 * x + 1000, {
+    let groundHeight = 120 * NoiseGenerator.perlin(0.002 * x + 100.1567, {
       octaveCount: 5,
       persistence: 0.6
     })
-    let groundClass = this.type.groundClass[Math.floor(Math.random() * this.type.groundClass.length)]
 
     if (y > groundHeight) {
       return {
@@ -48,6 +47,20 @@ class Environment {
         temperature: 0
       }
     } else {
+      let classes = this.type.groundClass
+      let groundClass
+      let maxLevel = -10
+      const sliceHeight = 20
+      let sliceNoise = sliceHeight * 3 * (0.5 + NoiseGenerator.perlin(0.0002 * x + 500.796 + 0.008 * y))
+      let slice = Math.floor((groundHeight - y + sliceNoise) / sliceHeight)
+      for (let i = 0; i < classes.length; i++) {
+        let level = NoiseGenerator.perlin(0.005 * x + 0.9431 + 10000 * slice + i * 45.1873)
+        if (level > maxLevel) {
+          groundClass = classes[i]
+          maxLevel = level
+        }
+      }
+
       return {
         class: groundClass,
         amount: 0,
