@@ -1,7 +1,7 @@
 /**
  * Returns an array of values from a range
  */
-export function arrayFromRange (min: number, max: number) {
+export function arrayFromRange(min: number, max: number) {
   let min_ = Math.floor(min)
   let max_ = Math.floor(max)
   const result = new Array(max_ - min_)
@@ -16,5 +16,9 @@ let debugMode = false
 /**
  * Debug mode
  */
-export function toggleDebugMode () { debugMode = !debugMode }
-export function getDebugMode (): boolean { return debugMode }
+export function toggleDebugMode() {
+  debugMode = !debugMode
+}
+export function getDebugMode(): boolean {
+  return debugMode
+}

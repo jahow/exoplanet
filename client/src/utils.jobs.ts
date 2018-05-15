@@ -1,7 +1,7 @@
 interface Job {
-	callback: Function,
-	thisObj: any,
-	timeout?: number
+  callback: Function
+  thisObj: any
+  timeout?: number
 }
 
 // maximum time allowed for jobs in ms
@@ -17,26 +17,30 @@ const jobQueue: Job[] = []
  * @param thisObj will be used as this when executing callback
  * @param timeout time in ms for the job to be removed if not run
  */
-export function addJobToQueue(callback: Function, thisObj: any, timeout?: number) {
-	jobQueue.push({
-		callback,
-		thisObj,
-		timeout: timeout || -1
-	})
+export function addJobToQueue(
+  callback: Function,
+  thisObj: any,
+  timeout?: number
+) {
+  jobQueue.push({
+    callback,
+    thisObj,
+    timeout: timeout || -1
+  })
 }
 
 /**
  * Will run jobs as long as frame time is available
  */
 export function updateJobQueue() {
-	let startTime = Date.now()
-	while (jobQueue.length) {
-		let job = jobQueue.shift()
-		job.callback.apply(job.thisObj)
+  let startTime = Date.now()
+  while (jobQueue.length) {
+    let job = jobQueue.shift()
+    job.callback.apply(job.thisObj)
 
-		// stop job execution if the cumulated execution time is above the limit
-		if (Date.now() - startTime > MAX_FRAME_TIME) {
-			break
-		}
-	}
+    // stop job execution if the cumulated execution time is above the limit
+    if (Date.now() - startTime > MAX_FRAME_TIME) {
+      break
+    }
+  }
 }

@@ -1,5 +1,5 @@
-import {startSimulation} from './simulation'
-import {initNetwork} from './network'
+import { startSimulation } from './simulation'
+import { initNetwork } from './network'
 
 // SETUP
 const express = require('express')
@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, '../..', 'client', 'dist')))
 app.use(express.static(path.join(__dirname, '../..', 'public')))
 
 // if no static file found, send 404
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   res.setHeader('Content-Type', 'text/plain')
   res.status(404).send('file not found')
 })
@@ -29,7 +29,7 @@ initNetwork(http)
 // SERVER LAUNCH
 var port = parseInt(argv.port) || parseInt(argv.p) || 8080
 
-var server = http.listen(port, function () {
+var server = http.listen(port, function() {
   var host = server.address().address
   var port = server.address().port
 

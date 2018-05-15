@@ -1,5 +1,5 @@
 import Grid from './grid'
-import {EnvironmentState} from './interfaces'
+import { EnvironmentState } from './interfaces'
 
 export default class Environment {
   grid: Grid

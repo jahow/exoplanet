@@ -1,7 +1,7 @@
-import Environment, {ENVIRONMENT_TYPE_DEFAULT} from './environment'
-import {getTime, capExtent} from './utility'
-import {sendMessage} from './network'
-import {compareExtents} from '../../shared/src/view-extent'
+import Environment, { ENVIRONMENT_TYPE_DEFAULT } from './environment'
+import { getTime, capExtent } from './utility'
+import { sendMessage } from './network'
+import { compareExtents } from '../../shared/src/view-extent'
 
 // in meters
 const MAX_EXTENT_SIZE = 1000
@@ -10,7 +10,7 @@ const MAX_EXTENT_SIZE = 1000
 // dispatching client actions, updating the environment by cycles
 
 class Simulation {
-  constructor () {
+  constructor() {
     // a value in ms; will be incremented by cycles
     this.time = 0
     this.lastUpdate = getTime()
@@ -23,14 +23,13 @@ class Simulation {
     this.viewers = {}
   }
 
-  getEnvironment () {
+  getEnvironment() {
     return this.environment
   }
 
-  start () {
-  }
+  start() {}
 
-  update () {
+  update() {
     const t = getTime()
     this.time = t - this.lastUpdate
     this.lastUpdate = t
@@ -38,10 +37,12 @@ class Simulation {
     // do stuff here
   }
 
-  registerViewer (id) {
+  registerViewer(id) {
     if (this.viewers[id]) {
-      console.error('A viewer with the id ' + id +
-        ' has already been registered: ', this.viewers[id])
+      console.error(
+        'A viewer with the id ' + id + ' has already been registered: ',
+        this.viewers[id]
+      )
       return
     }
     this.viewers[id] = {
@@ -49,7 +50,7 @@ class Simulation {
     }
   }
 
-  getViewer (id) {
+  getViewer(id) {
     if (!this.viewers[id]) {
       throw new Error('No viewer found with the id ' + id)
     }
@@ -57,11 +58,13 @@ class Simulation {
   }
 
   // once set here, an extent is always assumed to be valid
-  setViewExtent (viewerId, extent) {
+  setViewExtent(viewerId, extent) {
     const v = this.getViewer(viewerId)
     const newExtent = capExtent(extent, MAX_EXTENT_SIZE)
     if (compareExtents(newExtent, v.viewExtent)) {
-      sendMessage(viewerId, 'environmentState',
+      sendMessage(
+        viewerId,
+        'environmentState',
         this.environment.getPartialState(newExtent, v.viewExtent)
       )
       v.viewExtent = newExtent
@@ -73,21 +76,21 @@ class Simulation {
 // unique instance
 const sim = new Simulation()
 
-export function startSimulation () {
+export function startSimulation() {
   console.log('Simulation started')
   sim.start()
 }
 
-export function registerViewer (id) {
+export function registerViewer(id) {
   sim.registerViewer(id)
 }
 
 // might return something
-export function handleMessage (senderId, message, args) {
+export function handleMessage(senderId, message, args) {
   switch (message) {
     case 'moveView':
       const extent = sim.setViewExtent(senderId, args)
     case 'alterGridCell':
-      // return
+    // return
   }
 }

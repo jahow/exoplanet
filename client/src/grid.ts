@@ -1,9 +1,9 @@
-import {ChunkCollection} from './interfaces'
-import {GridChunk} from './mesh.gridchunk'
+import { ChunkCollection } from './interfaces'
+import { GridChunk } from './mesh.gridchunk'
 
 export default class Grid {
   chunks: {
-    [key: string]: GridChunk    // key is "<x> <y>"
+    [key: string]: GridChunk // key is "<x> <y>"
   }
 
   constructor() {

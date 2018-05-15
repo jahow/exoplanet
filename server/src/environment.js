@@ -1,7 +1,10 @@
 import Grid from './grid'
-import {CHUNK_SIZE} from '../../shared/src/globals'
+import { CHUNK_SIZE } from '../../shared/src/globals'
 import * as Materials from '../../shared/src/materials'
-import {getChunksInExtent, getChunksBySubtractingExtents} from '../../shared/src/view-extent'
+import {
+  getChunksInExtent,
+  getChunksBySubtractingExtents
+} from '../../shared/src/view-extent'
 import NoiseGenerator from './noise.js'
 
 NoiseGenerator.seed(Math.random())
@@ -19,7 +22,7 @@ export const ENVIRONMENT_TYPE_DEFAULT = {
     Materials.MATERIAL_VOLCANIC_ROCK
   ],
   seaClass: Materials.MATERIAL_WATER,
-  surfaceTemperature: [ 50, 230 ],
+  surfaceTemperature: [50, 230],
   perimeter: CHUNK_SIZE * 100
 }
 
@@ -27,17 +30,19 @@ export const ENVIRONMENT_TYPE_DEFAULT = {
 // it holds a grid of material that can be altered, and a list of entities
 
 class Environment {
-  constructor (environmentType) {
+  constructor(environmentType) {
     this.entities = []
     this.type = environmentType
     this.grid = new Grid(this.cellGenerationCallback.bind(this))
   }
 
-  cellGenerationCallback (x, y) {
-    let groundHeight = 120 * NoiseGenerator.perlin(0.002 * x + 100.1567, {
-      octaveCount: 5,
-      persistence: 0.6
-    })
+  cellGenerationCallback(x, y) {
+    let groundHeight =
+      120 *
+      NoiseGenerator.perlin(0.002 * x + 100.1567, {
+        octaveCount: 5,
+        persistence: 0.6
+      })
 
     if (y > groundHeight) {
       return {
@@ -51,10 +56,15 @@ class Environment {
       let groundClass
       let maxLevel = -10
       const sliceHeight = 20
-      let sliceNoise = sliceHeight * 3 * (0.5 + NoiseGenerator.perlin(0.0002 * x + 500.796 + 0.008 * y))
+      let sliceNoise =
+        sliceHeight *
+        3 *
+        (0.5 + NoiseGenerator.perlin(0.0002 * x + 500.796 + 0.008 * y))
       let slice = Math.floor((groundHeight - y + sliceNoise) / sliceHeight)
       for (let i = 0; i < classes.length; i++) {
-        let level = NoiseGenerator.perlin(0.005 * x + 0.9431 + 10000 * slice + i * 45.1873)
+        let level = NoiseGenerator.perlin(
+          0.005 * x + 0.9431 + 10000 * slice + i * 45.1873
+        )
         if (level > maxLevel) {
           groundClass = classes[i]
           maxLevel = level
@@ -70,16 +80,13 @@ class Environment {
     }
   }
 
-  getFullState (extent) {
+  getFullState(extent) {
     return {
-      chunks: this.grid.getChunks(
-        getChunksInExtent(extent),
-        true
-      )
+      chunks: this.grid.getChunks(getChunksInExtent(extent), true)
     }
   }
 
-  getPartialState (newExtent, oldExtent) {
+  getPartialState(newExtent, oldExtent) {
     return {
       chunks: this.grid.getChunks(
         getChunksBySubtractingExtents(oldExtent, newExtent),

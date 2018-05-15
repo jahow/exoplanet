@@ -1,14 +1,18 @@
-import {ViewExtent} from './interfaces'
-import {getCanvas, getEngine, getScene} from './globals'
-import {CHUNK_SIZE} from '../../shared/src/globals'
-import {updateInputState, isKeyPressed, KeyCode} from './utils.input'
-import {handleViewMove} from './events.network'
-import {getDebugMode} from './utils.misc'
-import {compareExtents, addBufferToExtent, copyExtent,
-  getChunksBySubtractingExtents} from '../../shared/src/view-extent'
-import {getEnvironment} from './environment'
+import { ViewExtent } from './interfaces'
+import { getCanvas, getEngine, getScene } from './globals'
+import { CHUNK_SIZE } from '../../shared/src/globals'
+import { updateInputState, isKeyPressed, KeyCode } from './utils.input'
+import { handleViewMove } from './events.network'
+import { getDebugMode } from './utils.misc'
+import {
+  compareExtents,
+  addBufferToExtent,
+  copyExtent,
+  getChunksBySubtractingExtents
+} from '../../shared/src/view-extent'
+import { getEnvironment } from './environment'
 
-const DEFAULT_VIEW_RESOLUTION = 0.25    // meters per pixel
+const DEFAULT_VIEW_RESOLUTION = 0.25 // meters per pixel
 
 // unit per second
 const VIEW_PAN_SPEED = 100
@@ -21,9 +25,14 @@ let currentResolution = DEFAULT_VIEW_RESOLUTION
  * Init camera
  */
 export function initView() {
-  camera = new BABYLON.ArcRotateCamera('main',
-    -Math.PI / 2, Math.PI / 2, 10,
-    new BABYLON.Vector3(16, 16, 0), getScene())
+  camera = new BABYLON.ArcRotateCamera(
+    'main',
+    -Math.PI / 2,
+    Math.PI / 2,
+    10,
+    new BABYLON.Vector3(16, 16, 0),
+    getScene()
+  )
 
   camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA
   moveView(BABYLON.Vector2.Zero())
@@ -40,7 +49,8 @@ function updateCameraParams() {
   let targetX = currentTarget.x
   let targetY = currentTarget.y
 
-  const floor = (a: number) => Math.floor(a / currentResolution) * currentResolution
+  const floor = (a: number) =>
+    Math.floor(a / currentResolution) * currentResolution
 
   if (getDebugMode()) {
     width *= 2
@@ -80,7 +90,6 @@ export function moveViewRelative(targetDiff: BABYLON.Vector2) {
 
   moveView(target)
 }
-
 
 /**
  * Returns an extent (min/max X, min/max Y) from a camera
@@ -139,7 +148,10 @@ export function updateView() {
     addBufferToExtent(previousBuffered, CHUNK_SIZE * 3)
     newBuffered = copyExtent(newExtent, newBuffered)
     addBufferToExtent(newBuffered, CHUNK_SIZE * 3)
-    const toRelease = getChunksBySubtractingExtents(newBuffered, previousBuffered)
+    const toRelease = getChunksBySubtractingExtents(
+      newBuffered,
+      previousBuffered
+    )
     const grid = getEnvironment().getGrid()
     toRelease.forEach(coord => {
       grid.removeChunkByKey(`${coord[0]} ${coord[1]}`)

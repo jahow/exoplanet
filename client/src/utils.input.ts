@@ -38,7 +38,7 @@ enum KeyState {
   FIRST_PRESSED
 }
 interface GlobalInputState {
-  keyboard: {[key: string]: KeyState},
+  keyboard: { [key: string]: KeyState }
   pointer: any
 }
 const inputState: GlobalInputState = {
@@ -51,9 +51,9 @@ export function initInput() {
   window.addEventListener('keydown', evt => {
     // use keycode if key is not a single char
     if (evt.key.length === 1) {
-      inputState.keyboard[evt.key] = KeyState.FIRST_PRESSED 
+      inputState.keyboard[evt.key] = KeyState.FIRST_PRESSED
     } else {
-      inputState.keyboard[evt.keyCode] = KeyState.FIRST_PRESSED 
+      inputState.keyboard[evt.keyCode] = KeyState.FIRST_PRESSED
     }
   })
   window.addEventListener('keyup', evt => {
@@ -70,6 +70,8 @@ export function updateInputState() {
 }
 
 export function isKeyPressed(key: KeyCode | string, firstPressed?: boolean) {
-  return (!firstPressed && inputState.keyboard[key] === KeyState.PRESSED) ||
+  return (
+    (!firstPressed && inputState.keyboard[key] === KeyState.PRESSED) ||
     inputState.keyboard[key] === KeyState.FIRST_PRESSED
+  )
 }

@@ -1,9 +1,9 @@
 import * as io from 'socket.io-client'
 import init from './main'
-import {CHUNK_SIZE} from '../../shared/src/globals'
-import {getEnvironment} from './environment'
-import {EnvironmentState} from './interfaces'
-import {getViewExtent} from './utils.view'
+import { CHUNK_SIZE } from '../../shared/src/globals'
+import { getEnvironment } from './environment'
+import { EnvironmentState } from './interfaces'
+import { getViewExtent } from './utils.view'
 
 // socket init
 const socket = io()
@@ -13,10 +13,10 @@ socket.on('connect', () => {
 })
 
 socket.on('message', (message: any) => {
-  switch(message.name) {
+  switch (message.name) {
     case 'environmentState':
       handleEnvironmentUpdate(message.args)
-      break;
+      break
   }
 })
 
