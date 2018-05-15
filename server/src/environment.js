@@ -40,7 +40,7 @@ class Environment {
     let groundHeight =
       120 *
       NoiseGenerator.perlin(0.002 * x + 100.1567, {
-        octaveCount: 5,
+        octaveCount: 2,
         persistence: 0.6
       })
 
@@ -55,15 +55,15 @@ class Environment {
       let classes = this.type.groundClass
       let groundClass
       let maxLevel = -10
-      const sliceHeight = 20
+      const sliceHeight = 40
       let sliceNoise =
         sliceHeight *
-        3 *
         (0.5 + NoiseGenerator.perlin(0.0002 * x + 500.796 + 0.008 * y))
       let slice = Math.floor((groundHeight - y + sliceNoise) / sliceHeight)
       for (let i = 0; i < classes.length; i++) {
         let level = NoiseGenerator.perlin(
-          0.005 * x + 0.9431 + 10000 * slice + i * 45.1873
+          0.001 * x + 0.9431 + 1213.543 * slice + i * 45.1873,
+          0.001 * y + 0.523 + 412.754 * slice + i * 12.64
         )
         if (level > maxLevel) {
           groundClass = classes[i]
