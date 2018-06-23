@@ -1,4 +1,4 @@
-import { pushColoredQuad } from './utils.geom'
+import { ExtendedMesh } from './utils.geom'
 import { getScene } from './globals'
 import { getGenericMaterial, getCellColor } from './mesh.materials'
 import { ChunkInfo } from './interfaces'
@@ -16,14 +16,14 @@ export interface GridCell {
 export class GridChunk {
   baseX: number
   baseY: number
-  mesh: BABYLON.Mesh
+  mesh: ExtendedMesh
   cells: GridCell[]
   revision: number
 
   constructor(baseX: number, baseY: number) {
     this.baseX = baseX
     this.baseY = baseY
-    this.mesh = new BABYLON.Mesh(`chunk ${baseX} ${baseY}`, getScene())
+    this.mesh = new ExtendedMesh(`chunk ${baseX} ${baseY}`, getScene())
     this.mesh.material = getGenericMaterial()
     this.mesh.visibility = 0.999
     this.mesh.position.x = baseX
@@ -59,14 +59,18 @@ export class GridChunk {
     for (let y = 0; y < CHUNK_SIZE; y++) {
       for (let x = 0; x < CHUNK_SIZE; x++) {
         cell = this.cells[cellIndex]
-        pushColoredQuad(pos, col, ind, x, x + 1, y, y + 1, getCellColor(cell))
+        this.mesh.pushQuad({
+          minX: x,
+          maxX: x + 1,
+          minY: y,
+          maxY: y + 1,
+          color: getCellColor(cell)
+        })
         cellIndex++
       }
     }
 
-    this.mesh.setVerticesData(BABYLON.VertexBuffer.PositionKind, pos, true)
-    this.mesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, col, true)
-    this.mesh.setIndices(ind, pos.length / 3, true)
+    this.mesh.commit()
   }
 
   dispose() {

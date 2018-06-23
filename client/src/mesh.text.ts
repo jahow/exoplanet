@@ -1,6 +1,6 @@
 import * as TinySDF from 'tiny-sdf'
 import { arrayFromRange } from './utils.misc'
-import { pushTexturedQuad } from './utils.geom'
+import { ExtendedMesh } from './utils.geom'
 import { getScene } from './globals'
 
 interface GlyphInfo {
@@ -146,9 +146,9 @@ export function generateTextMesh(
   position: BABYLON.Vector2,
   anchor: [number, number],
   color?: BABYLON.Color4,
-  existingMesh?: BABYLON.Mesh
-): BABYLON.Mesh {
-  const mesh = existingMesh || new BABYLON.Mesh('text', getScene())
+  existingMesh?: ExtendedMesh
+): ExtendedMesh {
+  const mesh = existingMesh || new ExtendedMesh('text', getScene())
   let color_ = color || BABYLON.Color4.FromInts(255, 255, 255, 255)
 
   // font bundle (reuse if available)
@@ -161,10 +161,6 @@ export function generateTextMesh(
   mesh.visibility = 0.9999
   mesh.renderingGroupId = 3
   mesh.isPickable = false
-  const positions: number[] = []
-  const colors: number[] = []
-  const uvs: number[] = []
-  const indices: number[] = []
 
   // compute global width & height and start position
   const chars = text.split('')
@@ -181,29 +177,22 @@ export function generateTextMesh(
   chars.forEach(char => {
     let glyph = bundle.glyphs[char] || bundle.defaultGlyph
     let width = glyph.widthRatio * charHeight
-    pushTexturedQuad(
-      positions,
-      colors,
-      uvs,
-      indices,
-      x - buffer,
-      x + width + buffer,
-      y - buffer,
-      y + totalHeight + buffer,
-      color_,
-      glyph.minU,
-      glyph.maxU,
-      glyph.minV,
-      glyph.maxV
-    )
+    mesh.pushQuad({
+      minX: x - buffer,
+      maxX: x + width + buffer,
+      minY: y - buffer,
+      maxY: y + totalHeight + buffer,
+      color: color_,
+      minU: glyph.minU,
+      maxU: glyph.maxU,
+      minV: glyph.minV,
+      maxV: glyph.maxV
+    })
     x += width
   })
 
   // apply to mesh
-  mesh.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions, true)
-  mesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors, true)
-  mesh.setVerticesData(BABYLON.VertexBuffer.UVKind, uvs, true)
-  mesh.setIndices(indices, positions.length / 3, true)
+  mesh.commit()
 
   return mesh
 }

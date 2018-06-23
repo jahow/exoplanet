@@ -1,4 +1,4 @@
-import { pushColoredQuad } from './utils.geom'
+import { ExtendedMesh } from './utils.geom'
 import { getViewExtent } from './utils.view'
 import { getGenericMaterial } from './mesh.materials'
 import { generateTextMesh, TEXT_ANCHOR } from './mesh.text'
@@ -15,13 +15,13 @@ export default class Graticule {
   minY: number
   maxY: number
   rootMesh: BABYLON.Mesh
-  mesh: BABYLON.Mesh
-  textMeshes: BABYLON.Mesh[]
+  mesh: ExtendedMesh
+  textMeshes: ExtendedMesh[]
 
   constructor() {
     this.rootMesh = new BABYLON.Mesh('graticule root', getScene())
 
-    this.mesh = new BABYLON.Mesh('graticule', getScene())
+    this.mesh = new ExtendedMesh('graticule', getScene())
     this.mesh.material = getGenericMaterial()
     this.mesh.visibility = 0.9999 // triggers alpha blending
     this.mesh.renderingGroupId = 3
@@ -81,26 +81,21 @@ export default class Graticule {
 
     for (let x = this.minX; x <= this.maxX + CHUNK_SIZE; x += CHUNK_SIZE) {
       for (let y = this.minY; y <= this.maxY + CHUNK_SIZE; y += CHUNK_SIZE) {
-        pushColoredQuad(
-          this.positions,
-          this.colors,
-          this.indices,
-          x - 1,
-          x,
-          y - 4.5,
-          y + 3.5,
-          BABYLON.Color4.FromInts(255, 255, 255, 100)
-        )
-        pushColoredQuad(
-          this.positions,
-          this.colors,
-          this.indices,
-          x - 4.5,
-          x + 3.5,
-          y - 1,
-          y,
-          BABYLON.Color4.FromInts(255, 255, 255, 100)
-        )
+        this.mesh
+          .pushQuad({
+            minX: x - 1,
+            maxX: x,
+            minY: y - 4.5,
+            maxY: y + 3.5,
+            color: BABYLON.Color4.FromInts(255, 255, 255, 100)
+          })
+          .pushQuad({
+            minX: x - 4.5,
+            maxX: x + 3.5,
+            minY: y - 1,
+            maxY: y,
+            color: BABYLON.Color4.FromInts(255, 255, 255, 100)
+          })
 
         // text mesh
         // TODO: optimize this to reduce the performance hit
@@ -119,12 +114,6 @@ export default class Graticule {
       }
     }
 
-    this.mesh.setVerticesData(
-      BABYLON.VertexBuffer.PositionKind,
-      this.positions,
-      true
-    )
-    this.mesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, this.colors, true)
-    this.mesh.setIndices(this.indices, this.positions.length / 3, true)
+    this.mesh.commit()
   }
 }
