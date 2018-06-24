@@ -8,14 +8,18 @@ import { initView, updateView } from './utils.view'
 import { initInput, updateInputState, isKeyPressed } from './utils.input'
 import { toggleDebugMode } from './utils.misc'
 import { updateJobQueue } from './utils.jobs'
+import { Overlay } from './ui'
 
 export default function init() {
   initGlobals()
   initInput()
   initView()
 
+  const uiOverlay = new Overlay()
+
   window.onresize = () => {
     getEngine().resize()
+    uiOverlay.handleResize()
   }
 
   // getScene().debugLayer.show()
@@ -32,6 +36,7 @@ export default function init() {
     updateInputState()
     updateView()
     updateJobQueue()
+    uiOverlay.update()
 
     getScene().render()
   })
