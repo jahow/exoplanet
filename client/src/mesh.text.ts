@@ -122,6 +122,7 @@ function generateFontBundle(
   }
 }
 
+// TODO: use ./enums module
 export const TEXT_ANCHOR: { [key: string]: [number, number] } = {
   TOPLEFT: [0, 1],
   TOPRIGHT: [1, 1],

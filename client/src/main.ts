@@ -8,21 +8,21 @@ import { initView, updateView } from './utils.view'
 import { initInput, updateInputState, isKeyPressed } from './utils.input'
 import { toggleDebugMode } from './utils.misc'
 import { updateJobQueue } from './utils.jobs'
-import { Overlay } from './ui'
+import { getOverlayManager } from './utils.overlay'
+import { initUI } from './ui'
 
 export default function init() {
   initGlobals()
   initInput()
   initView()
 
-  const uiOverlay = new Overlay()
-
   window.onresize = () => {
     getEngine().resize()
-    uiOverlay.handleResize()
+    getOverlayManager().handleResize()
   }
 
   // getScene().debugLayer.show()
+  initUI()
 
   const graticule = new Graticule()
 
@@ -36,7 +36,7 @@ export default function init() {
     updateInputState()
     updateView()
     updateJobQueue()
-    uiOverlay.update()
+    getOverlayManager().update()
 
     getScene().render()
   })
