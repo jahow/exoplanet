@@ -79,6 +79,8 @@ export default class Graticule {
 
     let text
 
+    this.mesh.clearVertices()
+
     for (let x = this.minX; x <= this.maxX + CHUNK_SIZE; x += CHUNK_SIZE) {
       for (let y = this.minY; y <= this.maxY + CHUNK_SIZE; y += CHUNK_SIZE) {
         this.mesh
