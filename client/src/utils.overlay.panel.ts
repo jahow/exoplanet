@@ -1,6 +1,6 @@
 import { ExtendedMesh } from './utils.geom'
 import { AnchorType, RenderingGroup } from './enums'
-import { getScene, getCanvas } from './globals'
+import { getCanvas } from './globals'
 import { getOverlayManager } from './utils.overlay'
 
 type LayoutDimension = string | number
@@ -34,8 +34,8 @@ export class OverlayPanel extends BasePanel {
 
 		this.attrs = attrs
 
-		this.mesh = new ExtendedMesh('panel', getScene())
-		this.mesh.renderingGroupId = RenderingGroup.UI
+		this.mesh = new ExtendedMesh('panel', getOverlayManager().getScene())
+		this.mesh.renderingGroupId = RenderingGroup.OVERLAY
 		this.mesh.visibility = 0.9999
 		this.mesh.alwaysSelectAsActiveMesh = true
 		this.mesh.material = getOverlayManager().getPanelMaterial()

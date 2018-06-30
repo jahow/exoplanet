@@ -12,6 +12,6 @@ export enum AnchorType {
 
 export enum RenderingGroup {
 	ENVIRONMENT = 0,
-	UI = 2,
+	OVERLAY = 2,
 	DEBUG = 3
 }

@@ -39,5 +39,6 @@ export default function init() {
     getOverlayManager().update()
 
     getScene().render()
+    getOverlayManager().render()
   })
 }
