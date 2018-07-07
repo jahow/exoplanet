@@ -21,8 +21,8 @@ export default function init() {
     getOverlayManager().handleResize()
   }
 
-  // getScene().debugLayer.show()
   initUI()
+  getOverlayManager().handleResize()
 
   const graticule = new Graticule()
 

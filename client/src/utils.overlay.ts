@@ -73,8 +73,6 @@ class OverlayManager {
     this.renderTarget.addPostProcess(ppBlurV)
     this.camera.detachPostProcess(ppBlurH)
     this.camera.detachPostProcess(ppBlurV)
-
-    this.handleResize()
   }
 
   getScene() {
