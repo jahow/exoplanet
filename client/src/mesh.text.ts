@@ -2,6 +2,7 @@ import * as TinySDF from 'tiny-sdf'
 import { arrayFromRange } from './utils.misc'
 import { ExtendedMesh } from './utils.geom'
 import { getScene } from './globals'
+import { AnchorType } from './enums'
 
 interface GlyphInfo {
   widthRatio: number // width / height
@@ -12,24 +13,27 @@ interface GlyphInfo {
 }
 
 interface FontBundle {
+  key: string
   material: BABYLON.Material
   glyphs: { [key: string]: GlyphInfo }
   defaultGlyph: GlyphInfo
-  bufferRatio: number // buffer / height
+  bufferRatio: number // buffer / height,
+  scene: BABYLON.Scene
 }
 
-const bundles: { [key: string]: FontBundle } = {}
+const bundles: FontBundle[] = []
 
 /**
  * Will return a FontBundle with a material and info on contained glyphs
  */
 function generateFontBundle(
   fontFamily: string,
-  fontWeight: 'normal' | 'bold'
+  fontWeight: 'normal' | 'bold',
+  scene?: BABYLON.Scene
 ): FontBundle {
   const textMaterial = new BABYLON.ShaderMaterial(
     'text',
-    getScene(),
+    scene || getScene(),
     './text-shader',
     {
       attributes: ['position', 'color', 'uv'],
@@ -115,24 +119,13 @@ function generateFontBundle(
   textMaterial.setFloat('gamma', 0.13)
 
   return {
+    key: fontFamily + '#' + fontWeight,
+    scene: textMaterial.getScene(),
     material: textMaterial,
     bufferRatio: buffer / fontSize,
     glyphs,
     defaultGlyph: glyphs[chars[chars.length - 1]] // last glyph is the default one
   }
-}
-
-// TODO: use ./enums module
-export const TEXT_ANCHOR: { [key: string]: [number, number] } = {
-  TOPLEFT: [0, 1],
-  TOPRIGHT: [1, 1],
-  BOTTOMLEFT: [0, 0],
-  BOTTOMRIGHT: [1, 0],
-  CENTER: [0.5, 0.5],
-  MIDDLELEFT: [0, 0.5],
-  MIDDLERIGHT: [1, 0.5],
-  TOPMIDDLE: [0.5, 1],
-  BOTTOMMIDDLE: [0.5, 0]
 }
 
 /**
@@ -145,7 +138,7 @@ export function generateTextMesh(
   text: string,
   charHeight: number,
   position: BABYLON.Vector2,
-  anchor: [number, number],
+  anchor: AnchorType,
   color?: BABYLON.Color4,
   existingMesh?: ExtendedMesh
 ): ExtendedMesh {
@@ -154,8 +147,13 @@ export function generateTextMesh(
 
   // font bundle (reuse if available)
   const key = fontFamily + '#' + fontWeight
-  const bundle = bundles[key] || generateFontBundle(fontFamily, fontWeight)
-  bundles[key] = bundle
+  let bundle = bundles.find(
+    bundle => bundle.key === key && bundle.scene == mesh.getScene()
+  )
+  if (!bundle) {
+    bundle = generateFontBundle(fontFamily, fontWeight, mesh.getScene())
+    bundles.push(bundle)
+  }
 
   // generate mesh vertices
   mesh.material = bundle.material

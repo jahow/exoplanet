@@ -1,10 +1,11 @@
 import { ExtendedMesh } from './utils.geom'
 import { getViewExtent } from './utils.view'
 import { getGenericMaterial } from './mesh.materials'
-import { generateTextMesh, TEXT_ANCHOR } from './mesh.text'
+import { generateTextMesh } from './mesh.text'
 import { getScene } from './globals'
 import { CHUNK_SIZE } from '../../shared/src/globals'
 import { getDebugMode } from './utils.misc'
+import { AnchorType, AnchorTypes } from './enums'
 
 export default class Graticule {
   positions: number[]
@@ -36,7 +37,7 @@ export default class Graticule {
       'origin',
       6,
       new BABYLON.Vector2(16, 16),
-      TEXT_ANCHOR.CENTER
+      AnchorTypes.CENTER
     )
     originMesh.parent = this.rootMesh
   }
@@ -107,7 +108,7 @@ export default class Graticule {
           `${x},${y}`,
           4,
           new BABYLON.Vector2(x + 2, y + 2),
-          TEXT_ANCHOR.BOTTOMLEFT,
+          AnchorTypes.BOTTOMLEFT,
           BABYLON.Color4.FromInts(255, 255, 255, 100)
         )
         text.parent = this.rootMesh

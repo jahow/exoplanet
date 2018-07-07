@@ -1,5 +1,5 @@
 import Graticule from './mesh.graticule'
-import { generateTextMesh, TEXT_ANCHOR } from './mesh.text'
+import { generateTextMesh } from './mesh.text'
 import { initGlobals, getEngine, getScene, getCanvas } from './globals'
 import { getEnvironment } from './environment'
 import { EnvironmentState } from './interfaces'

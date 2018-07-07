@@ -326,7 +326,7 @@ export class OverlayText extends BasePanel {
       'arial',
       'normal',
       this.text,
-      14,
+      16,
       new BABYLON.Vector2(this._lastBounds.minX, this._lastBounds.minY),
       AnchorTypes.BOTTOMLEFT,
       BABYLON.Color4.FromInts(255, 255, 255, 255),
