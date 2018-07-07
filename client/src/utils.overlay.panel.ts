@@ -100,8 +100,8 @@ function computeAnchorPosition(
   bounds: PanelBounds
 ): AnchorPosition {
   return {
-    x: bounds.minX + (bounds.minX + bounds.maxX) * anchorType[0],
-    y: bounds.minY + (bounds.minY + bounds.maxY) * anchorType[1]
+    x: bounds.minX + (bounds.maxX - bounds.minX) * anchorType[0],
+    y: bounds.minY + (bounds.maxY - bounds.minY) * anchorType[1]
   }
 }
 function shiftAnchorPosition(
@@ -321,7 +321,6 @@ export class OverlayText extends BasePanel {
 
   regenerate(anchorType: AnchorType, anchorPosition: AnchorPosition) {
     this._lastBounds = computeBounds(this.getSize(), anchorType, anchorPosition)
-
     this.mesh = generateTextMesh(
       'arial',
       'normal',
