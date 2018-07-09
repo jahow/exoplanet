@@ -160,6 +160,7 @@ export function generateTextMesh(
   mesh.visibility = 0.9999
   mesh.renderingGroupId = 3
   mesh.isPickable = false
+  mesh.clearVertices()
 
   // compute global width & height and start position
   const chars = text.split('')
