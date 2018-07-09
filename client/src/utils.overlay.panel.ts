@@ -2,7 +2,7 @@ import { ExtendedMesh } from './utils.geom'
 import { AnchorType, AnchorTypes, RenderingGroup, ContentFlow } from './enums'
 import { getCanvas } from './globals'
 import { getOverlayManager } from './utils.overlay'
-import { generateTextMesh } from './mesh.text'
+import { generateTextMesh, measureText, TextParams } from './mesh.text'
 
 type LayoutDimension = string | number
 
@@ -412,6 +412,12 @@ interface TextAttributes extends BaseAttributes {
   maxWidth?: LayoutDimension
 }
 
+const overlayTextParams: TextParams = {
+  fontFamily: 'arial',
+  fontWeight: 'normal',
+  charHeight: 16
+}
+
 export class OverlayText extends BasePanel {
   mesh: ExtendedMesh
   attrs: TextAttributes
@@ -423,14 +429,11 @@ export class OverlayText extends BasePanel {
     this.mesh = new ExtendedMesh('overlay-text', getOverlayManager().getScene())
   }
 
-  computeSize(): PanelComputedSize {
-    // try to compute size first
-    this._computedSize = {
-      width: 100,
-      height: 40
-    }
-
-    return this._computedSize
+  computeSize() {
+    this._computedSize = measureText({
+      params: overlayTextParams,
+      text: this.text
+    })
   }
 
   regenerate(
@@ -443,15 +446,16 @@ export class OverlayText extends BasePanel {
       anchorType,
       anchorPosition
     )
-    this.mesh = generateTextMesh(
-      'arial',
-      'normal',
-      this.text,
-      16,
-      new BABYLON.Vector2(this._lastBounds.minX, this._lastBounds.minY),
-      AnchorTypes.BOTTOMLEFT,
-      BABYLON.Color4.FromInts(255, 255, 255, 255),
-      this.mesh
-    )
+    this.mesh = generateTextMesh({
+      params: overlayTextParams,
+      text: this.text,
+      position: new BABYLON.Vector2(
+        this._lastBounds.minX,
+        this._lastBounds.minY
+      ),
+      anchor: AnchorTypes.BOTTOMLEFT,
+      color: BABYLON.Color4.FromInts(255, 255, 255, 255),
+      existingMesh: this.mesh
+    })
   }
 }
