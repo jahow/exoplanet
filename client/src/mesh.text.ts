@@ -21,14 +21,28 @@ interface FontBundle {
   scene: BABYLON.Scene
 }
 
+export interface TextParams {
+  fontFamily: string
+  fontWeight: 'normal' | 'bold'
+  charHeight: number
+}
+
+interface TextSize {
+  width: number
+  height: number
+}
+
 const bundles: FontBundle[] = []
+
+// utils
+const generateKey = (params: TextParams) =>
+  params.fontFamily + '#' + params.fontWeight
 
 /**
  * Will return a FontBundle with a material and info on contained glyphs
  */
 function generateFontBundle(
-  fontFamily: string,
-  fontWeight: 'normal' | 'bold',
+  params: TextParams,
   scene?: BABYLON.Scene
 ): FontBundle {
   const textMaterial = new BABYLON.ShaderMaterial(
@@ -63,7 +77,7 @@ function generateFontBundle(
     false
   )
   const ctx = texture.getContext()
-  ctx.font = fontWeight + ' ' + fontSize + 'px ' + fontFamily
+  ctx.font = params.fontWeight + ' ' + fontSize + 'px ' + params.fontFamily
   ctx.textBaseline = 'middle'
 
   // chars to draw
@@ -79,8 +93,8 @@ function generateFontBundle(
     buffer,
     8,
     0.25,
-    fontFamily,
-    fontWeight
+    params.fontFamily,
+    params.fontWeight
   )
   let x = 0,
     y = 0,
@@ -119,7 +133,7 @@ function generateFontBundle(
   textMaterial.setFloat('gamma', 0.13)
 
   return {
-    key: fontFamily + '#' + fontWeight,
+    key: generateKey(params),
     scene: textMaterial.getScene(),
     material: textMaterial,
     bufferRatio: buffer / fontSize,
@@ -132,26 +146,24 @@ function generateFontBundle(
  * Generates a mesh for text rendering
  * Optional: give an existing mesh as argument to reuse it
  */
-export function generateTextMesh(
-  fontFamily: string,
-  fontWeight: 'normal' | 'bold',
-  text: string,
-  charHeight: number,
-  position: BABYLON.Vector2,
-  anchor: AnchorType,
-  color?: BABYLON.Color4,
+export function generateTextMesh(options: {
+  params: TextParams
+  text: string
+  position: BABYLON.Vector2
+  anchor: AnchorType
+  color?: BABYLON.Color4
   existingMesh?: ExtendedMesh
-): ExtendedMesh {
-  const mesh = existingMesh || new ExtendedMesh('text', getScene())
-  let color_ = color || BABYLON.Color4.FromInts(255, 255, 255, 255)
+}): ExtendedMesh {
+  const mesh = options.existingMesh || new ExtendedMesh('text', getScene())
+  let color_ = options.color || BABYLON.Color4.FromInts(255, 255, 255, 255)
 
   // font bundle (reuse if available)
-  const key = fontFamily + '#' + fontWeight
+  const key = generateKey(options.params)
   let bundle = bundles.find(
     bundle => bundle.key === key && bundle.scene == mesh.getScene()
   )
   if (!bundle) {
-    bundle = generateFontBundle(fontFamily, fontWeight, mesh.getScene())
+    bundle = generateFontBundle(options.params, mesh.getScene())
     bundles.push(bundle)
   }
 
@@ -163,20 +175,20 @@ export function generateTextMesh(
   mesh.clearVertices()
 
   // compute global width & height and start position
-  const chars = text.split('')
-  const buffer = bundle.bufferRatio * charHeight
+  const chars = options.text.split('')
+  const buffer = bundle.bufferRatio * options.params.charHeight
   const totalWidth = chars.reduce((prev, char) => {
     let glyph = bundle.glyphs[char] || bundle.defaultGlyph
-    return prev + glyph.widthRatio * charHeight
+    return prev + glyph.widthRatio * options.params.charHeight
   }, 0)
-  const totalHeight = charHeight
-  let x = position.x - anchor[0] * totalWidth
-  let y = position.y - anchor[1] * totalHeight
+  const totalHeight = options.params.charHeight
+  let x = options.position.x - options.anchor[0] * totalWidth
+  let y = options.position.y - options.anchor[1] * totalHeight
 
   // push one quad per letter
   chars.forEach(char => {
     let glyph = bundle.glyphs[char] || bundle.defaultGlyph
-    let width = glyph.widthRatio * charHeight
+    let width = glyph.widthRatio * options.params.charHeight
     mesh.pushQuad({
       minX: x - buffer,
       maxX: x + width + buffer,
@@ -195,4 +207,34 @@ export function generateTextMesh(
   mesh.commit()
 
   return mesh
+}
+
+/**
+ * Measure text based on font params
+ */
+export function measureText(options: {
+  params: TextParams
+  text: string
+}): TextSize {
+  // font bundle (reuse if available)
+  const key = generateKey(options.params)
+  let bundle = bundles.find(bundle => bundle.key === key)
+  if (!bundle) {
+    bundle = generateFontBundle(options.params)
+    bundles.push(bundle)
+  }
+
+  // compute global width & height and start position
+  const chars = options.text.split('')
+  const buffer = bundle.bufferRatio * options.params.charHeight
+  const width = chars.reduce((prev, char) => {
+    let glyph = bundle.glyphs[char] || bundle.defaultGlyph
+    return prev + glyph.widthRatio * options.params.charHeight
+  }, 0)
+  const height = options.params.charHeight
+
+  return {
+    width,
+    height
+  }
 }

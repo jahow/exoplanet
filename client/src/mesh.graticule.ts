@@ -31,14 +31,16 @@ export default class Graticule {
 
     this.textMeshes = []
 
-    const originMesh = generateTextMesh(
-      'monospace',
-      'normal',
-      'origin',
-      6,
-      new BABYLON.Vector2(16, 16),
-      AnchorTypes.CENTER
-    )
+    const originMesh = generateTextMesh({
+      params: {
+        fontFamily: 'monospace',
+        fontWeight: 'normal',
+        charHeight: 6
+      },
+      text: 'origin',
+      position: new BABYLON.Vector2(16, 16),
+      anchor: AnchorTypes.CENTER
+    })
     originMesh.parent = this.rootMesh
   }
 
@@ -102,15 +104,17 @@ export default class Graticule {
 
         // text mesh
         // TODO: optimize this to reduce the performance hit
-        text = generateTextMesh(
-          'monospace',
-          'normal',
-          `${x},${y}`,
-          4,
-          new BABYLON.Vector2(x + 2, y + 2),
-          AnchorTypes.BOTTOMLEFT,
-          BABYLON.Color4.FromInts(255, 255, 255, 100)
-        )
+        text = generateTextMesh({
+          params: {
+            fontFamily: 'monospace',
+            fontWeight: 'normal',
+            charHeight: 4
+          },
+          text: `${x},${y}`,
+          position: new BABYLON.Vector2(x + 2, y + 2),
+          anchor: AnchorTypes.BOTTOMLEFT,
+          color: BABYLON.Color4.FromInts(255, 255, 255, 100)
+        })
         text.parent = this.rootMesh
 
         this.textMeshes.push(text)
