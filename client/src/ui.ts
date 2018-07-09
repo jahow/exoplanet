@@ -7,10 +7,10 @@ export function initUI() {
 		childAnchor: AnchorTypes.TOPLEFT,
 		childFlow: ContentFlow.COL_INVERSE,
 		position: {
-			left: 0,
-			right: 0,
-			bottom: 0,
-			top: '100% - 300'
+			left: 20,
+			right: 20,
+			bottom: 20,
+			top: '100% - 200'
 		}
 	})
 	getOverlayManager().registerPanel(lowerContainer)
@@ -22,4 +22,15 @@ export function initUI() {
 		new OverlayText({}, `item ${i}`).setParent(item)
 		getOverlayManager().registerPanel(item)
 	}
+
+	const options = new OverlayPanel({
+		childAnchor: AnchorTypes.CENTER,
+		position: {
+			top: 20,
+			right: 20
+		}
+	})
+	options.setParent(lowerContainer)
+	new OverlayText({}, '+').setParent(options)
+	getOverlayManager().registerPanel(options)
 }

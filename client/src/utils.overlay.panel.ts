@@ -6,7 +6,7 @@ import { generateTextMesh } from './mesh.text'
 
 type LayoutDimension = string | number
 
-interface PanelBounds {
+interface PanelComputedBounds {
   minX: number
   maxX: number
   minY: number
@@ -32,6 +32,20 @@ const GUTTER = 20
 let idCounter = 0
 
 // utilities for computing panel bounds
+function getCanvasBounds(): PanelComputedBounds {
+  return {
+    minX: 0,
+    maxX: getCanvas().width,
+    minY: 0,
+    maxY: getCanvas().height
+  }
+}
+function getCanvasSize(): PanelComputedSize {
+  return {
+    width: getCanvas().width,
+    height: getCanvas().height
+  }
+}
 function computeValue(value: LayoutDimension, parentValue: number): number {
   if (value === undefined || value === null) {
     return 0
@@ -81,11 +95,11 @@ function combineSizes(
     }
   }
 }
-function computeBounds(
+function computeAnchoredBounds(
   computedSize: PanelComputedSize,
   anchorType: AnchorType,
   anchorPosition: AnchorPosition
-): PanelBounds {
+): PanelComputedBounds {
   const minX = anchorPosition.x - computedSize.width * anchorType[0]
   const minY = anchorPosition.y - computedSize.height * anchorType[1]
   return {
@@ -95,9 +109,105 @@ function computeBounds(
     maxY: minY + computedSize.height
   }
 }
+function computePositionedBounds(
+  position: PanelPosition,
+  size?: PanelComputedSize,
+  frameBounds?: PanelComputedBounds
+): PanelComputedBounds {
+  const frame = frameBounds || getCanvasBounds()
+  const mySize = size || {
+    width: 20,
+    height: 20
+  }
+  const frameWidth = frame.maxX - frame.minX
+  const frameHeight = frame.maxY - frame.minY
+
+  const minX =
+    position.left !== undefined
+      ? frame.minX + computeValue(position.left, frameWidth)
+      : undefined
+  const maxX =
+    position.right !== undefined
+      ? frame.minX + frameWidth - computeValue(position.right, frameWidth)
+      : undefined
+  const minY =
+    position.bottom !== undefined
+      ? frame.minY + computeValue(position.bottom, frameHeight)
+      : undefined
+  const maxY =
+    position.top !== undefined
+      ? frame.minY + frameHeight - computeValue(position.top, frameHeight)
+      : undefined
+
+  // cannot have two indeterminate values on one axis
+  if (
+    (minX === undefined && maxX === undefined) ||
+    (minY === undefined && maxY === undefined)
+  ) {
+    console.warn(
+      'Invalid UI panel position: at least one dimension is indefinite',
+      position
+    )
+    return {
+      minX: 0,
+      maxX: 0,
+      minY: 0,
+      maxY: 0
+    }
+  }
+
+  return {
+    minX: minX !== undefined ? minX : maxX - mySize.width,
+    maxX: maxX !== undefined ? maxX : minX + mySize.width,
+    minY: minY !== undefined ? minY : maxY - mySize.height,
+    maxY: maxY !== undefined ? maxY : minY + mySize.height
+  }
+}
+function computePositionedSize(
+  position: PanelPosition,
+  frameSize?: PanelComputedSize
+): PanelComputedSize {
+  const frame = frameSize || getCanvasSize()
+
+  // cannot have two indeterminate values on one axis
+  if (
+    (position.left === undefined && position.right === undefined) ||
+    (position.bottom === undefined && position.top === undefined)
+  ) {
+    console.warn(
+      'Invalid UI panel position: at least one dimension is indefinite',
+      position
+    )
+    return {
+      width: 20,
+      height: 20
+    }
+  }
+
+  return {
+    width:
+      position.left === undefined || position.right === undefined
+        ? 20
+        : Math.max(
+            20,
+            frame.width -
+              computeValue(position.right, frame.width) -
+              computeValue(position.left, frame.width)
+          ),
+    height:
+      position.bottom === undefined || position.top === undefined
+        ? 20
+        : Math.max(
+            20,
+            frame.height -
+              computeValue(position.top, frame.height) -
+              computeValue(position.bottom, frame.height)
+          )
+  }
+}
 function computeAnchorPosition(
   anchorType: AnchorType,
-  bounds: PanelBounds
+  bounds: PanelComputedBounds
 ): AnchorPosition {
   return {
     x: bounds.minX + (bounds.maxX - bounds.minX) * anchorType[0],
@@ -140,7 +250,7 @@ export class BasePanel {
   parent: BasePanel
   children: BasePanel[]
   protected _computedSize: PanelComputedSize
-  protected _lastBounds: PanelBounds
+  protected _lastBounds: PanelComputedBounds
 
   constructor(attrs: BaseAttributes) {
     this.id = idCounter++
@@ -162,29 +272,11 @@ export class BasePanel {
   }
 
   computeSize() {
-    const frameSize = this.parent
-      ? this.parent.getSize()
-      : {
-          width: getCanvas().width,
-          height: getCanvas().height
-        }
+    const frameSize = this.parent && this.parent.getSize()
 
     // use position if available
     if (this.isPositioned()) {
-      const left = computeValue(this.attrs.position.left, frameSize.width)
-      const right =
-        frameSize.width -
-        computeValue(this.attrs.position.right, frameSize.width)
-      const bottom = computeValue(this.attrs.position.bottom, frameSize.height)
-      const top =
-        frameSize.height -
-        computeValue(this.attrs.position.top, frameSize.height)
-
-      this._computedSize = {
-        width: Math.max(20, right - left),
-        height: Math.max(20, top - bottom)
-      }
-
+      this._computedSize = computePositionedSize(this.attrs.position, frameSize)
       return
     }
 
@@ -194,7 +286,11 @@ export class BasePanel {
     }
   }
 
-  regenerate(anchorType: AnchorType, anchorPosition: AnchorPosition) {}
+  regenerate(
+    anchorType: AnchorType,
+    anchorPosition: AnchorPosition,
+    parentBounds?: PanelComputedBounds
+  ) {}
 
   update() {}
 
@@ -261,8 +357,24 @@ export class OverlayPanel extends BasePanel {
     return this._computedSize
   }
 
-  regenerate(anchorType: AnchorType, anchorPosition: AnchorPosition) {
-    this._lastBounds = computeBounds(this.getSize(), anchorType, anchorPosition)
+  regenerate(
+    anchorType: AnchorType,
+    anchorPosition: AnchorPosition,
+    parentBounds?: PanelComputedBounds
+  ) {
+    if (!this.isPositioned()) {
+      this._lastBounds = computeAnchoredBounds(
+        this.getSize(),
+        anchorType,
+        anchorPosition
+      )
+    } else {
+      this._lastBounds = computePositionedBounds(
+        this.attrs.position,
+        this.getSize(),
+        parentBounds
+      )
+    }
 
     // generate quad
     this.mesh
@@ -283,13 +395,15 @@ export class OverlayPanel extends BasePanel {
       this.attrs.childAnchor,
       this._lastBounds
     )
-    this.children.filter(c => !c.isPositioned()).forEach(panel => {
-      panel.regenerate(this.attrs.childAnchor, anchorPos)
-      anchorPos = shiftAnchorPosition(
-        this.attrs.childFlow,
-        anchorPos,
-        panel.getSize()
-      )
+    this.children.forEach(panel => {
+      panel.regenerate(this.attrs.childAnchor, anchorPos, this._lastBounds)
+      if (!panel.isPositioned()) {
+        anchorPos = shiftAnchorPosition(
+          this.attrs.childFlow,
+          anchorPos,
+          panel.getSize()
+        )
+      }
     })
   }
 }
@@ -319,8 +433,16 @@ export class OverlayText extends BasePanel {
     return this._computedSize
   }
 
-  regenerate(anchorType: AnchorType, anchorPosition: AnchorPosition) {
-    this._lastBounds = computeBounds(this.getSize(), anchorType, anchorPosition)
+  regenerate(
+    anchorType: AnchorType,
+    anchorPosition: AnchorPosition,
+    parentBounds?: PanelComputedBounds
+  ) {
+    this._lastBounds = computeAnchoredBounds(
+      this.getSize(),
+      anchorType,
+      anchorPosition
+    )
     this.mesh = generateTextMesh(
       'arial',
       'normal',
